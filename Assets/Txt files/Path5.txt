@@ -1,0 +1,8 @@
+5
+Hi tech factory
+Defending this Hi tech factory enables better and stronger tower creation
+1
+Increase Railgun Tower Stats
+1
+2
+EOF

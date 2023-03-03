@@ -1,0 +1,8 @@
+3
+Missile Factory
+Defending this Missile factory enables better and stronger tower creation
+1
+Increase Missile Tower Stats
+1
+3
+EOF

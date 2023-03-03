@@ -1,0 +1,8 @@
+2
+Carbon Mine
+Defend this mine to secure more founding for your missions
+1
+Increase resources
+10
+5
+EOF

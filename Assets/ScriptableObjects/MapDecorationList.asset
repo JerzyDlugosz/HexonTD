@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa469c5f7a5288e428df25833e3cfa5c, type: 3}
+  m_Name: MapDecorationList
+  m_EditorClassIdentifier: 
+  plainsTileMaterial: {fileID: 2100000, guid: 3581bc618518b994194e533a2ec810d4, type: 2}
+  plainsDecoration:
+  - {fileID: 2862111872498230458, guid: ae5a70ca4f92c524ca1246acc4f780ae, type: 3}
+  - {fileID: 6623965782206754529, guid: 86980b447911a4c4997014d4d3b99b16, type: 3}
+  - {fileID: 3796324490632412487, guid: 9fad69605efbc0248859b7133dc8e6de, type: 3}
+  taigaTileMaterial: {fileID: 2100000, guid: 41597940af94c9d4093f284fc7b813a9, type: 2}
+  taigaDecorations:
+  - {fileID: 3200903540935982567, guid: 650340a0d48412e4aa97cf210e8e8790, type: 3}
+  - {fileID: 8051770277076561326, guid: 7a5e494c955fabe468583bef56e49098, type: 3}
+  - {fileID: 2867658410636538885, guid: fdf42f4dd16a57d4187ca6ab216d129f, type: 3}
+  fungalTileMaterial: {fileID: 2100000, guid: a53214d208467224fb1f748d0863409c, type: 2}
+  fungalDecorations:
+  - {fileID: 2750418380105741505, guid: 3a470899cbb49124e965052b3cc7a0b6, type: 3}
+  forestTileMaterial: {fileID: 2100000, guid: 3581bc618518b994194e533a2ec810d4, type: 2}
+  forestDecorations:
+  - {fileID: 4894252975286812355, guid: 9a91c98c3a88cee45b78e2980591132a, type: 3}
+  - {fileID: 1379397666562562288, guid: 437376ecb25b3b84ea5deafda81845bf, type: 3}
+  - {fileID: 1139458744030958886, guid: b97e8bea5d0a591439df8ee67fb98e17, type: 3}
+  - {fileID: 1190181831423344927, guid: 459e4c3ae630f504b80485d53038ad14, type: 3}
+  tundraTileMaterial: {fileID: 2100000, guid: 41597940af94c9d4093f284fc7b813a9, type: 2}
+  tundraDecorations: []
+  desertTileMaterial: {fileID: 2100000, guid: bc1ff4c0d5164214cb2266d254491769, type: 2}
+  desertDecorations:
+  - {fileID: 8882753894879613597, guid: 7a3333b5ccb558342939003db37fd52c, type: 3}

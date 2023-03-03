@@ -1,0 +1,8 @@
+4
+Power Plant
+Defending this power plant enables better and stronger tower creation
+1
+Increase Tesla Tower Stats
+1
+1
+EOF
