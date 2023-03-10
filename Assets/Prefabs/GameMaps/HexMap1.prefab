@@ -230,7 +230,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1393116718246402653}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.527, y: 0.41, z: 6.56}
+  m_LocalPosition: {x: 7.49, y: 0.41, z: 6.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -256,7 +256,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.2, y: 0.2, z: 0.2}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1393116718615953316
 GameObject:
@@ -318,6 +318,16 @@ MonoBehaviour:
   pathArrowCanvas: {fileID: 0}
   decorationTilesParent: {fileID: 1393116717700187067}
   PathTilesParent: {fileID: 87303287017557972}
+  EnemyTypeForWave:
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 0f9ae79427642904581916b41016b2e8, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 0f9ae79427642904581916b41016b2e8, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
 --- !u!1 &1393116719145941783
 GameObject:
   m_ObjectHideFlags: 0

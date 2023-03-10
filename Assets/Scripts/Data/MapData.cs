@@ -12,4 +12,5 @@ public class MapData : MonoBehaviour
     public GameObject pathArrowCanvas;
     public GameObject decorationTilesParent;
     public GameObject PathTilesParent;
+    public List<Enemy> EnemyTypeForWave;
 }

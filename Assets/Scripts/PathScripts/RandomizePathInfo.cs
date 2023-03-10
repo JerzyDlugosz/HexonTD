@@ -4,36 +4,62 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static Enumerables;
 using Random = UnityEngine.Random;
 
 public class RandomizePathInfo : MonoBehaviour
 {
     public List<TextAsset> pathInformations = new List<TextAsset>();
+    List<List<PathDataNotMono>> pathDataList;
 
     public void OnGameStart()
     {
-        for (int i = 0; i < 10; i++)
+
+        //if (mapNumber == MapNumber.Map1)
+        //{
+        //    pathDataList = GetComponent<WorldPathData>().w1PathDatas;
+        //}
+        //if (mapNumber == MapNumber.Map2)
+        //{
+        //    pathDataList = GetComponent<WorldPathData>().w2PathDatas;
+        //}
+        //if (mapNumber == MapNumber.Map3)
+        //{
+        //    pathDataList = GetComponent<WorldPathData>().w3PathDatas;
+        //}
+
+        pathDataList = new List<List<PathDataNotMono>>()
         {
-            PathDataNotMono pathData = new PathDataNotMono(); //gameObject.AddComponent<PathData>();
+            GetComponent<WorldPathData>().w1PathDatas,
+            GetComponent<WorldPathData>().w2PathDatas,
+            GetComponent<WorldPathData>().w3PathDatas
+        };
 
-            string text = RandomizeFile();
+        for (int j = 0; j < 3; j++)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                PathDataNotMono pathData = new PathDataNotMono(); //gameObject.AddComponent<PathData>();
 
-            Debug.Log(text);
+                string text = RandomizeFile();
 
-            List<string> list = SetInfo(text);
+                Debug.Log(text);
 
-            pathData.pathNumber = int.Parse(list[0]);
-            pathData.pathName = list[1];
-            pathData.pathDescription = list[2];
-            pathData.pathDifficulty = (PathDifficulty)int.Parse(list[3]);
-            pathData.rewardName = list[4];
-            pathData.rewardAmmount = int.Parse(list[5]);
-            pathData.rewardType = (RewardType)int.Parse(list[6]);
+                List<string> list = SetInfo(text);
 
-            Debug.Log(pathData);
+                pathData.pathNumber = int.Parse(list[0]);
+                pathData.pathName = list[1];
+                pathData.pathDescription = list[2];
+                pathData.pathDifficulty = (PathDifficulty)int.Parse(list[3]);
+                pathData.rewardName = list[4];
+                pathData.rewardAmmount = int.Parse(list[5]);
+                pathData.rewardType = (RewardType)int.Parse(list[6]);
 
-            GetComponent<WorldPathData>().pathDatas.Add(pathData);
+                Debug.Log(pathData);
+
+                pathDataList[j].Add(pathData);
+            }
         }
     }
 

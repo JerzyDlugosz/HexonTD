@@ -1,7 +1,7 @@
 2
 Carbon Mine
 Defend this mine to secure more founding for your missions
-1
+0
 Increase resources
 10
 5

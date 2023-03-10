@@ -17,6 +17,9 @@ public class EnemyStats : MonoBehaviour
 
     public EnemyTypes enemyType;
     public int spawnNumber;
+
+    [Range(0.01f, 10)]
+    public float armor = 1;
 }
 
 

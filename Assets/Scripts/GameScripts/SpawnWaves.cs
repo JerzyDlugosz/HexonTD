@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 public class SpawnWaves : MonoBehaviour
 {
-    public List<int> waves = new List<int>();
-    public List<int> waveType;
-
     public AvailableEnemies availableEnemies;
 
     public List<GameObject> enemiesOnScreen = new List<GameObject>();
@@ -35,30 +32,23 @@ public class SpawnWaves : MonoBehaviour
 
     public bool lastEnemySpawned = false;
 
-    GameStateManager gameStateManager;
+    private GameStateManager gameStateManager;
+
+    private MapData mapData;
+    private float difficultyModifier;
 
     // Start is called before the first frame update
     void Start()
     {
-        int i = 0;
-        foreach(int number in waves)
-        {
-            if (waveType[i] == 2)
-            {
-                enemyNumber += number * 3;
-            }
-            enemyNumber += number;
-            i++;
-        }
         gameStateManager = GameObject.Find("PresistentGameController").GetComponent<GameStateManager>();
     }
 
-    private bool onGameEnd = true;
+    private bool onGameEnd = true; //bool so the if in runs works only once
 
     // Update is called once per frame
     void Update()
     {            
-        if ((enemyNumber == 0 && lastEnemySpawned) && (enemiesOnScreen.Count == 0 && onGameEnd))
+        if ((enemyNumber <= 0 && lastEnemySpawned) && (enemiesOnScreen.Count == 0 && onGameEnd))
         {
             winScreen.SetActive(true);
             StartCoroutine(PlayWinAnimation());
@@ -78,6 +68,20 @@ public class SpawnWaves : MonoBehaviour
 
     public void StartWave()
     {
+        mapData = GetComponent<StartGame>().mapData;
+        if (gameStateManager.GetComponent<PathData>().pathDifficulty == PathDifficulty.Easy)
+        {
+            difficultyModifier = 1f;
+        }
+        if (gameStateManager.GetComponent<PathData>().pathDifficulty == PathDifficulty.Normal)
+        {
+            difficultyModifier = 1.5f;
+        }
+        if (gameStateManager.GetComponent<PathData>().pathDifficulty == PathDifficulty.Hard)
+        {
+            difficultyModifier = 2f;
+        }
+        SetEnemyNumber();
         StartCoroutine(spawnUnit());
         StartCoroutine(StartDrawingCards());
     }
@@ -85,25 +89,49 @@ public class SpawnWaves : MonoBehaviour
     IEnumerator spawnUnit()
     {
         GameObject Enemy;
-        for (int i = 0; i < waves.Count; i++)
+        Debug.Log(mapData.EnemyTypeForWave.Count);
+        for (int i = 0; i < mapData.EnemyTypeForWave.Count; i++)
         {
-            //Debug.Log($"Wave {waveNumber}");
-            for (int j = 0; j < waves[waveNumber]; j++)
+            Debug.Log(mapData.EnemyTypeForWave[i].EnemyAmount);
+            int enemyAmount = (int)(mapData.EnemyTypeForWave[i].EnemyAmount * difficultyModifier);
+            for (int j = 0; j < enemyAmount; j++)
             {
                 yield return new WaitForSeconds(spawnSpeed);
-                Debug.Log($"Enemy! ID: {enemyIDNumber} / wave number: {waveNumber} / Max Enemies: {waves[waveNumber]}");
-                Enemy = GameObject.Instantiate(availableEnemies.EnemyPrefabs[waveType[waveNumber]], spawnPoint.transform.position, Quaternion.identity);
+                Debug.Log($"Enemy! ID: {enemyIDNumber} / wave number: {i + 1} / Max Enemies: {enemyAmount}");
+                Enemy = GameObject.Instantiate(mapData.EnemyTypeForWave[i].EnemyPrefab, spawnPoint.transform.position, Quaternion.identity);
                 Enemy.GetComponent<FollowNavMesh>().start = spawnPoint.transform;
                 Enemy.GetComponent<FollowNavMesh>().finish = destination.transform;
                 enemiesOnScreen.Add(Enemy);
-                ModifyStats(Enemy, enemyIDNumber, waveNumber);
+                ModifyStats(Enemy, enemyIDNumber, waveNumber, difficultyModifier);
                 SetVisuals(Enemy);
-                spawnSpeed = Enemy.GetComponent<EnemyStats>().spawnSpeed;
+                spawnSpeed = mapData.EnemyTypeForWave[i].SpawnSpeed;
+                //spawnSpeed = Enemy.GetComponent<EnemyStats>().spawnSpeed;
                 enemyIDNumber++;
             }
             waveNumber++;
         }
         lastEnemySpawned = true;
+
+        //GameObject Enemy;
+        //for (int i = 0; i < waves.Count; i++)
+        //{
+        //    //Debug.Log($"Wave {waveNumber}");
+        //    for (int j = 0; j < waves[waveNumber]; j++)
+        //    {
+        //        yield return new WaitForSeconds(spawnSpeed);
+        //        Debug.Log($"Enemy! ID: {enemyIDNumber} / wave number: {waveNumber} / Max Enemies: {waves[waveNumber]}");
+        //        Enemy = GameObject.Instantiate(availableEnemies.Enemies[waveType[waveNumber]].EnemyPrefab, spawnPoint.transform.position, Quaternion.identity);
+        //        Enemy.GetComponent<FollowNavMesh>().start = spawnPoint.transform;
+        //        Enemy.GetComponent<FollowNavMesh>().finish = destination.transform;
+        //        enemiesOnScreen.Add(Enemy);
+        //        ModifyStats(Enemy, enemyIDNumber, waveNumber);
+        //        SetVisuals(Enemy);
+        //        spawnSpeed = Enemy.GetComponent<EnemyStats>().spawnSpeed;
+        //        enemyIDNumber++;
+        //    }
+        //    waveNumber++;
+        //}
+        //lastEnemySpawned = true;
     }
 
 
@@ -122,10 +150,10 @@ public class SpawnWaves : MonoBehaviour
         GameStateManager.instance.ApplyWinReward();
     }
 
-    void ModifyStats(GameObject enemy, int enemyId, int waveNumber)
+    void ModifyStats(GameObject enemy, int enemyId, int waveNumber, float _difficultyModifier)
     {
-        enemy.GetComponent<EnemyStats>().maxHealth += (waveNumber * 2.2f);
-        enemy.GetComponent<EnemyStats>().health += (waveNumber * 2.2f);
+        enemy.GetComponent<EnemyStats>().maxHealth += (waveNumber * 2.2f) * _difficultyModifier;
+        enemy.GetComponent<EnemyStats>().health += (waveNumber * 2.2f) * _difficultyModifier;
         //enemy.transform.GetChild(0).GetComponent<EnemyStats>().speed = 1;
         //enemy.transform.GetChild(0).GetComponent<EnemyStats>().damage = 1;
         //enemy.transform.GetChild(0).GetComponent<EnemyStats>().reward = 1;
@@ -171,5 +199,17 @@ public class SpawnWaves : MonoBehaviour
         card.GetComponent<SpellLogic>().spellStatistics = availableCards.cards[cardNumber];
         card.transform.SetParent(cardsHolder);
         card.transform.localScale = Vector3.one;
+    }
+
+    void SetEnemyNumber()
+    {
+        foreach (Enemy enemy in mapData.EnemyTypeForWave)
+        {
+            if (enemy.enemyType == EnemyTypes.Multiply)
+            {
+                enemyNumber += (int)(enemy.EnemyAmount * difficultyModifier) * 3;
+            }
+            enemyNumber += (int)(enemy.EnemyAmount * difficultyModifier);
+        }
     }
 }

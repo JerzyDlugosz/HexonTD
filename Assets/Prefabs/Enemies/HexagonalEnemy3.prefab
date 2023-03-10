@@ -1482,6 +1482,7 @@ MonoBehaviour:
   hpSlider: {fileID: 772174944496522365}
   enemyType: 3
   spawnNumber: 3
+  armor: 1
 --- !u!1 &8185750835982706162
 GameObject:
   m_ObjectHideFlags: 0

@@ -14,6 +14,14 @@ public class Save
     public float startingMaterials;
     public float maxCardDraw;
 
-    public List<SerializablePathData> pathDatas = new List<SerializablePathData>();
-    public bool[] beatenPaths = new bool[10];
+    public List<SerializablePathData> w1PathDatas = new List<SerializablePathData>();
+    public bool[] w1BeatenPaths = new bool[10];
+
+    public List<SerializablePathData> w2PathDatas = new List<SerializablePathData>();
+    public bool[] w2BeatenPaths = new bool[10];
+
+    public List<SerializablePathData> w3PathDatas = new List<SerializablePathData>();
+    public bool[] w3BeatenPaths = new bool[10];
+
+    public int currentWorld;
 }

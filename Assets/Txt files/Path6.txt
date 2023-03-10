@@ -1,7 +1,7 @@
 6
 Bionic Laboratory
 Defending this Bionic Laboratory enables better and stronger tower creation
-1
+2
 Increase Hero Tower Stats
 1
 4

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
 public class WorldTransformation : MonoBehaviour
 {
@@ -20,6 +19,10 @@ public class WorldTransformation : MonoBehaviour
     private Transform cameraHolder;
     private Vector3 cameraAngle;
     private Vector3 targetDirection;
+
+    [SerializeField]
+    private GameObject alertPrefab;
+    private GameObject alert;
     
 
     private void Start()
@@ -92,93 +95,83 @@ public class WorldTransformation : MonoBehaviour
     {
         if (isAnimationRunning)
         {
-            targetDirection = currentTile.transform.position - cameraHolder.position;
-            // The step size is equal to speed times frame time.
-            float singleStep = multiplier * Time.deltaTime;
-
-            // Rotate the forward vector towards the target direction by one step
-            //Vector3 newDirection = Vector3.RotateTowards(new Vector3(0, 0, -cameraHolder.position.z), targetDirection, singleStep, 0.0f);
-            //Vector3 newDirection = Vector3.RotateTowards(cameraHolder.forward, targetDirection, singleStep, 0.0f);
-
-            Quaternion rotation = Quaternion.LookRotation(targetDirection);
-
-            if (Mathf.Abs(Quaternion.Dot(cameraHolder.rotation, rotation)) > 0.9999f)
-            {
-
-                isAnimationRunning = false;
-                return;
-            }
-
-            cameraHolder.rotation = Quaternion.Lerp(cameraHolder.rotation, rotation, singleStep);
             return;
         }
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //RaycastHit[] hits = Physics.RaycastAll(ray);
 
         if(Physics.Raycast(ray, out RaycastHit hitInfo))
         {
             if (hitInfo.transform.CompareTag("Path"))
             {
-                if (!hitInfo.transform.GetComponent<RaycastData>().isRaycasted)
+                if (hitInfo.transform.GetComponent<PathData>().isCompleted)
                 {
-                    hitInfo.transform.GetComponent<RaycastData>().isRaycasted = true;
-                    if (hitInfo.transform.GetComponent<PathData>().isCompleted)
-                    {
-                        return;
-                    }
-                    hitInfo.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
-                    currentTile = hitInfo.transform;
-                    SetDescription(hitInfo.transform.GetComponent<PathData>());
+                    return;
                 }
+                onTileHover(hitInfo);
             }
             else if (hitInfo.transform.CompareTag("ResetFlags") && currentTile)
             {
                 if (!hitInfo.transform.GetComponent<RaycastData>().isRaycasted)
                 {
-                    currentTile.localScale = new Vector3(1f, 1f, 1f);
-                    currentTile.GetComponent<RaycastData>().isRaycasted = false;
-                    currentTile = null;
-                    NullDescription();
+                    ResetFlags();
                 }
             }
         }
         else if (currentTile != null)
         {
-            currentTile.localScale = new Vector3(1f, 1f, 1f);
-            currentTile.GetComponent<RaycastData>().isRaycasted = false;
-            currentTile = null;
-            NullDescription();
+            ResetFlags();
         }
-
-        //CheckFlags(hits);
-
-        //foreach (RaycastHit hit in hits)
-        //{
-        //    if (hit.transform.CompareTag("Path"))
-        //    {
-        //        if(!hit.transform.GetComponent<RaycastData>().isRaycasted)
-        //        {
-        //            hit.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
-        //            hit.transform.GetComponent<RaycastData>().isRaycasted = true;
-        //        }
-        //    }
-        //}    
     }
 
-    void CheckFlags(RaycastHit[] hits)
+    private void FixedUpdate()
     {
-        foreach (RaycastHit hit in hits)
+        if (isAnimationRunning)
         {
-            if (hit.transform.CompareTag("Path"))
-            {
-                if (hit.transform.GetComponent<RaycastData>().isRaycasted)
-                {
-                    hit.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
-                    hit.transform.GetComponent<RaycastData>().isRaycasted = true;
-                }
-            }
+            OnAnimationRunning();
         }
+    }
+
+    private void OnAnimationRunning()
+    {
+        targetDirection = currentTile.transform.position - cameraHolder.position;
+        float singleStep = multiplier * Time.deltaTime;
+
+        Quaternion rotation = Quaternion.LookRotation(targetDirection);
+
+        if (Mathf.Abs(Quaternion.Dot(cameraHolder.rotation, rotation)) > 0.9999f)
+        {
+
+            isAnimationRunning = false;
+            return;
+        }
+
+        cameraHolder.rotation = Quaternion.Lerp(cameraHolder.rotation, rotation, singleStep);
+    }
+
+    private void onTileHover(RaycastHit hitInfo)
+    {
+        if (!hitInfo.transform.GetComponent<RaycastData>().isRaycasted)
+        {
+            hitInfo.transform.GetComponent<RaycastData>().isRaycasted = true;
+            hitInfo.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
+            currentTile = hitInfo.transform;
+            SetDescription(hitInfo.transform.GetComponent<PathData>());
+            //if (alert == null)
+            //{
+            //    alert = Instantiate(alertPrefab);
+            //}
+            //alert.transform.position = currentTile.transform.position;
+            //alert.transform.LookAt(cameraHolder.position);
+        }
+    }
+
+    void ResetFlags()
+    {
+        currentTile.localScale = new Vector3(1f, 1f, 1f);
+        currentTile.GetComponent<RaycastData>().isRaycasted = false;
+        currentTile = null;
+        NullDescription();
     }
 
     void SetDescription(PathData path)

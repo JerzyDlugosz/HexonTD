@@ -5,7 +5,14 @@ using UnityEngine;
 public class WorldPathData : MonoBehaviour
 {
 
-    public List<PathDataNotMono> pathDatas = new List<PathDataNotMono>();
-    public bool[] beatenPaths = new bool[10];
+    public List<PathDataNotMono> w1PathDatas = new List<PathDataNotMono>();
+    public bool[] w1BeatenPaths = new bool[10];
+
+    public List<PathDataNotMono> w2PathDatas = new List<PathDataNotMono>();
+    public bool[] w2BeatenPaths = new bool[10];
+
+    public List<PathDataNotMono> w3PathDatas = new List<PathDataNotMono>();
+    public bool[] w3BeatenPaths = new bool[10];
+
 
 }

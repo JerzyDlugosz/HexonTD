@@ -215,6 +215,15 @@ MonoBehaviour:
   pathArrowCanvas: {fileID: 0}
   decorationTilesParent: {fileID: 8917482500895389246}
   PathTilesParent: {fileID: 7611702055596194385}
+  EnemyTypeForWave:
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 0f9ae79427642904581916b41016b2e8, type: 2}
 --- !u!1 &8917482500351078360
 GameObject:
   m_ObjectHideFlags: 0

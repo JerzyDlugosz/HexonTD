@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 387850720e8383b4cae8c2c9a2473194, type: 3}
   m_Name: Available Enemies
   m_EditorClassIdentifier: 
-  EnemyPrefabs:
-  - {fileID: 4152814932224062380, guid: 849fbdd059d7169428ede7a7276c2895, type: 3}
-  - {fileID: 1188160084410708573, guid: 4da0f149294a5854ca61fcd5054db687, type: 3}
-  - {fileID: 8159750918553883894, guid: 9e131676492c1bc41a7c11ec697811ec, type: 3}
+  Enemies:
+  - {fileID: 11400000, guid: 9e932cd6a84d4c74cbc06f126268d0e9, type: 2}
+  - {fileID: 11400000, guid: 9c2138204dd7076498a03a1be8531fa7, type: 2}
+  - {fileID: 11400000, guid: 0f9ae79427642904581916b41016b2e8, type: 2}

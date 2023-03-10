@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,10 +11,11 @@ public class ButtonScript : MonoBehaviour
 {
     GameStateManager gameStateManager;
     public WorldTransformation worldTransformation;
+    bool confirmationClick = false;
 
     void Start()
     {
-        gameStateManager = GameObject.Find("PresistentGameController").GetComponent<GameStateManager>();
+        gameStateManager = GameStateManager.instance;
     }
 
     public void LoadScene(int sceneNumber)
@@ -41,9 +43,9 @@ public class ButtonScript : MonoBehaviour
         gameStateManager.LoadSceneAndSetPaths(sceneNumber);
     }
 
-    public void LoadSceneWithPlayerData(int sceneNumber)
+    public void LoadSceneWithPlayerData()
     {
-        gameStateManager.LoadSceneWithPlayerData(sceneNumber);
+        gameStateManager.LoadSceneWithPlayerData();
     }
 
     public void LoadPlayerData()
@@ -60,9 +62,33 @@ public class ButtonScript : MonoBehaviour
         gameStateManager.LoadSceneAndResetSave(sceneNumber);
     }
 
-    public void ResetSave()
+    public void ResetSaveSetPathAndLoadScene(int sceneNumber)
     {
-        gameStateManager.SavePlayerData();
+        if(confirmationClick)
+        {
+            SetPaths();
+            gameStateManager.SavePlayerData();
+            LoadScene(sceneNumber);
+            return;
+        }
+        if(gameStateManager.CheckForSaveData(1))
+        {
+            Debug.Log("A save already exists! Do you want to start a new game? It will erase the old save file!");
+            confirmationClick = true;
+            return;
+        }
+    }
+
+    public void OnStartButtonClick(int sceneNumber)
+    {
+        //StartCoroutine(Anim());
+        ResetSaveSetPathAndLoadScene(sceneNumber);
+    }
+
+    public void OnContinueButtonClick(int sceneNumber)
+    {
+        //StartCoroutine(Anim());
+        ResetSaveSetPathAndLoadScene(sceneNumber);
     }
 
     public void SetPaths()
@@ -74,4 +100,9 @@ public class ButtonScript : MonoBehaviour
     {
         gameStateManager.ExitApplication();
     }
+
+    //IEnumerator Anim()
+    //{
+    //    yield return new WaitForEndOfFrame();
+    //}
 }

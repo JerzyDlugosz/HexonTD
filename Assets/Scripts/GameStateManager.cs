@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,11 +11,23 @@ public class GameStateManager : MonoBehaviour
     public int scenePathNumber = 0;
     private int SaveFile = 1;
 
+    PlayerData playerData;
+    PathData pathData;
+    WorldPathData worldPathData;
+
+    List<bool[]> beatenPathsList;
+    List<List<PathDataNotMono>> worldPathList;
+
+    private int[] sceneNumbers = { 3, 4, 5};
     private void Awake()
     {
         if(instance == null)
         {
             instance = this;
+
+            playerData = GetComponent<PlayerData>();
+            pathData = GetComponent<PathData>();
+            worldPathData = GetComponent<WorldPathData>();
         }
         else
         {
@@ -38,41 +46,121 @@ public class GameStateManager : MonoBehaviour
 
     public void ApplyWinReward()
     {
+        beatenPathsList = new List<bool[]>()
+            {
+                worldPathData.w1BeatenPaths,
+                worldPathData.w2BeatenPaths,
+                worldPathData.w3BeatenPaths
+            };
 
-        GetComponent<WorldPathData>().beatenPaths[GetComponent<PathData>().pathNumber] = true;
-        GetComponent<WorldPathData>().pathDatas[GetComponent<PathData>().pathNumber].isCompleted = true;
+        worldPathList = new List<List<PathDataNotMono>>()
+            {
+                worldPathData.w1PathDatas,
+                worldPathData.w2PathDatas,
+                worldPathData.w3PathDatas
+            };
+
+        beatenPathsList[playerData.currentWorld][pathData.pathNumber] = true;
+        worldPathList[playerData.currentWorld][pathData.pathNumber].isCompleted = true;
+
+
+        Debug.Log($"{playerData.currentWorld}, {pathData.pathNumber}, {beatenPathsList[playerData.currentWorld][pathData.pathNumber]}, {worldPathData.w2BeatenPaths[pathData.pathNumber]}");
+
+        int randomCapturedTile = RandomizeCapturedTile(playerData.currentWorld);
+
+        if(randomCapturedTile != -1)
+        {
+            beatenPathsList[playerData.currentWorld][randomCapturedTile] = true;
+            worldPathList[playerData.currentWorld][randomCapturedTile].isCompleted = true;
+        }
+
+        int temp = 0;
+
+        foreach (bool beatenPath in beatenPathsList[playerData.currentWorld])
+        {
+            if(!beatenPath)
+            {
+                temp += 1;
+            }
+        }
+
+        if(temp == 0)
+        {
+            playerData.currentWorld += 1;
+        }
+
 
         int i = 0;
         Modifiers = new List<List<float>>()
         {
-            GetComponent<PlayerData>().BasicTowerModifiers,
-            GetComponent<PlayerData>().TeslaTowerModifiers,
-            GetComponent<PlayerData>().RailgunTowerModifiers,
-            GetComponent<PlayerData>().MissileTowerModifiers,
-            GetComponent<PlayerData>().HeroTowerModifiers
+            playerData.BasicTowerModifiers,
+            playerData.TeslaTowerModifiers,
+            playerData.RailgunTowerModifiers,
+            playerData.MissileTowerModifiers,
+            playerData.HeroTowerModifiers
         };
 
         if ((int)GetComponent<PathData>().rewardType < 5)
         {
-            i = Random.Range(0, 6);
-            if (i % 2 == 0)
-            {
-                Modifiers[(int)GetComponent<PathData>().rewardType][i] += GetComponent<PathData>().rewardAmmount;
-            }
-            else
-            {
-                Modifiers[(int)GetComponent<PathData>().rewardType][i] += GetComponent<PathData>().rewardAmmount / 10;
-            }
+
+            //This code is for 6 modifiers, and ill probably only use 3
+            //i = Random.Range(0, 6);
+            //if (i % 2 == 0) //Additive bonus
+            //{
+            //    Modifiers[(int)GetComponent<PathData>().rewardType][i] += GetComponent<PathData>().rewardAmmount;
+            //}
+            //else  //Multiplicative bonus
+            //{
+            //    Modifiers[(int)GetComponent<PathData>().rewardType][i] += GetComponent<PathData>().rewardAmmount / 10;
+            //}
+
+            //This code is for 3 modifiers
+            i = Random.Range(0, 3);
+
+            Modifiers[(int)GetComponent<PathData>().rewardType][i*2] += GetComponent<PathData>().rewardAmmount;
+
         }
-        else
+        if((int)GetComponent<PathData>().rewardType == 6)
         {
             GetComponent<PlayerData>().startingMaterials += GetComponent<PathData>().rewardAmmount;
+        }
+        if((int)GetComponent<PathData>().rewardType == 7)
+        {
+            GetComponent<PlayerData>().maxCardDraw += GetComponent<PathData>().rewardAmmount;
         }
 
         Debug.Log($"Rolled Upgrade : {GetComponent<PathData>().rewardType} {i}");
 
         SavePlayerData();
+
+        if(randomCapturedTile == -1)
+        {
+            //LoadScene(sceneNumbers[playerData.currentWorld]);
+        }
+
         LoadScene(3);
+    }
+
+    private int RandomizeCapturedTile(int currentWorld)
+    {
+        List<int> list = new List<int>();
+
+        for (int i = 0; i < beatenPathsList[currentWorld].Length; i++)
+        {
+            if (!beatenPathsList[currentWorld][i])
+            {
+                list.Add(i);
+            }
+        }
+
+        if(list.Count == 0)
+        {
+            return -1;
+        }
+
+        int rand = Random.Range(0, list.Count);
+
+        return list[rand];
     }
 
 
@@ -80,10 +168,9 @@ public class GameStateManager : MonoBehaviour
     {
         StartCoroutine(LoadAsyncScene(sceneNumber));
     }
-
     public void LoadScenewithCameraZoomAnimation(int sceneNumber)
     {
-        StartCoroutine(LoadAsyncScene(sceneNumber));
+        LoadScene(sceneNumber);
     }
 
     public void LoadSceneAndResetSave(int sceneNumber)
@@ -112,13 +199,22 @@ public class GameStateManager : MonoBehaviour
         LoadScene(sceneNumber);
     }
 
-    public void LoadSceneWithPlayerData(int sceneNumber)
+    //public void LoadSceneWithPlayerData()
+    //{
+    //    if(!LoadSaveFile(SaveFile))
+    //    {
+    //        return;
+    //    }
+    //    LoadScene(sceneNumbers[playerData.currentWorld]);
+    //}
+
+    public void LoadSceneWithPlayerData()
     {
-        if(!LoadSaveFile(SaveFile))
+        if (!LoadSaveFile(SaveFile))
         {
             return;
         }
-        LoadScene(sceneNumber);
+        LoadScene(3);
     }
 
     public void LoadPlayerData()
@@ -130,6 +226,16 @@ public class GameStateManager : MonoBehaviour
         SaveGameFile(SaveFile);
     }
 
+    public bool CheckForSaveData(int saveFile)
+    {
+        string saveFilePath = Path.Combine(Application.persistentDataPath, $"gamesave{saveFile}.json");
+        if(File.Exists(saveFilePath) )
+        {
+            return true;
+        }
+        return false;
+    }
+
     public bool LoadSaveFile(int saveFile)
     {
         string saveFilePath = Path.Combine(Application.persistentDataPath, $"gamesave{saveFile}.json");
@@ -139,17 +245,20 @@ public class GameStateManager : MonoBehaviour
             Save save = new Save();
             JsonUtility.FromJsonOverwrite(jsonText, save);
 
-            GetComponent<PlayerData>().BasicTowerModifiers = save.BasicTowerModifiers;
-            GetComponent<PlayerData>().MissileTowerModifiers = save.MissileTowerModifiers;
-            GetComponent<PlayerData>().TeslaTowerModifiers = save.TeslaTowerModifiers;
-            GetComponent<PlayerData>().RailgunTowerModifiers = save.RailgunTowerModifiers;
-            GetComponent<PlayerData>().HeroTowerModifiers = save.HeroTowerModifiers;
-            GetComponent<PlayerData>().startingMaterials = save.startingMaterials;
-            GetComponent<PlayerData>().maxCardDraw = save.maxCardDraw;
+            playerData.BasicTowerModifiers = save.BasicTowerModifiers;
+            playerData.MissileTowerModifiers = save.MissileTowerModifiers;
+            playerData.TeslaTowerModifiers = save.TeslaTowerModifiers;
+            playerData.RailgunTowerModifiers = save.RailgunTowerModifiers;
+            playerData.HeroTowerModifiers = save.HeroTowerModifiers;
+            playerData.startingMaterials = save.startingMaterials;
+            playerData.maxCardDraw = save.maxCardDraw;
+            playerData.currentWorld = save.currentWorld;
 
-            GetComponent<WorldPathData>().beatenPaths = save.beatenPaths;
+            GetComponent<WorldPathData>().w1BeatenPaths = save.w1BeatenPaths;
+            GetComponent<WorldPathData>().w2BeatenPaths = save.w2BeatenPaths;
+            GetComponent<WorldPathData>().w3BeatenPaths = save.w3BeatenPaths;
 
-            foreach(SerializablePathData saveData in save.pathDatas)
+            foreach (SerializablePathData saveData in save.w1PathDatas)
             {
                 PathDataNotMono pathData = new PathDataNotMono();
 
@@ -161,7 +270,37 @@ public class GameStateManager : MonoBehaviour
                 pathData.rewardAmmount = saveData.rewardAmmount;
                 pathData.rewardType = saveData.rewardType;
 
-                GetComponent<WorldPathData>().pathDatas.Add(pathData);
+                GetComponent<WorldPathData>().w1PathDatas.Add(pathData);
+            }
+
+            foreach (SerializablePathData saveData in save.w2PathDatas)
+            {
+                PathDataNotMono pathData = new PathDataNotMono();
+
+                pathData.pathNumber = saveData.pathNumber;
+                pathData.pathName = saveData.pathName;
+                pathData.pathDescription = saveData.pathDescription;
+                pathData.pathDifficulty = saveData.pathDifficulty;
+                pathData.rewardName = saveData.rewardName;
+                pathData.rewardAmmount = saveData.rewardAmmount;
+                pathData.rewardType = saveData.rewardType;
+
+                GetComponent<WorldPathData>().w2PathDatas.Add(pathData);
+            }
+
+            foreach (SerializablePathData saveData in save.w3PathDatas)
+            {
+                PathDataNotMono pathData = new PathDataNotMono();
+
+                pathData.pathNumber = saveData.pathNumber;
+                pathData.pathName = saveData.pathName;
+                pathData.pathDescription = saveData.pathDescription;
+                pathData.pathDifficulty = saveData.pathDifficulty;
+                pathData.rewardName = saveData.rewardName;
+                pathData.rewardAmmount = saveData.rewardAmmount;
+                pathData.rewardType = saveData.rewardType;
+
+                GetComponent<WorldPathData>().w3PathDatas.Add(pathData);
             }
 
             Debug.Log("Game Loaded");
@@ -227,17 +366,22 @@ public class GameStateManager : MonoBehaviour
 
     public void SetSaveData(Save save)
     {
-        save.BasicTowerModifiers = GetComponent<PlayerData>().BasicTowerModifiers;
-        save.MissileTowerModifiers = GetComponent<PlayerData>().MissileTowerModifiers;
-        save.TeslaTowerModifiers = GetComponent<PlayerData>().TeslaTowerModifiers;
-        save.RailgunTowerModifiers = GetComponent<PlayerData>().RailgunTowerModifiers;
-        save.HeroTowerModifiers = GetComponent<PlayerData>().HeroTowerModifiers;
-        save.startingMaterials = GetComponent<PlayerData>().startingMaterials;
-        save.maxCardDraw = GetComponent<PlayerData>().maxCardDraw;
+        save.BasicTowerModifiers = playerData.BasicTowerModifiers;
+        save.MissileTowerModifiers = playerData.MissileTowerModifiers;
+        save.TeslaTowerModifiers = playerData.TeslaTowerModifiers;
+        save.RailgunTowerModifiers = playerData.RailgunTowerModifiers;
+        save.HeroTowerModifiers = playerData.HeroTowerModifiers;
+        save.startingMaterials = playerData.startingMaterials;
+        save.maxCardDraw = playerData.maxCardDraw;
+        save.currentWorld = playerData.currentWorld;
 
-        save.beatenPaths = GetComponent<WorldPathData>().beatenPaths;
 
-        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().pathDatas)
+        save.w1BeatenPaths = GetComponent<WorldPathData>().w1BeatenPaths;
+        save.w2BeatenPaths = GetComponent<WorldPathData>().w2BeatenPaths;
+        save.w3BeatenPaths = GetComponent<WorldPathData>().w3BeatenPaths;
+
+
+        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().w1PathDatas)
         {
             SerializablePathData serializablePathData = new SerializablePathData();
 
@@ -249,8 +393,38 @@ public class GameStateManager : MonoBehaviour
             serializablePathData.rewardAmmount = pathData.rewardAmmount;
             serializablePathData.rewardType = pathData.rewardType;
 
-            save.pathDatas.Add(serializablePathData);
-        }  
+            save.w1PathDatas.Add(serializablePathData);
+        }
+
+        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().w2PathDatas)
+        {
+            SerializablePathData serializablePathData = new SerializablePathData();
+
+            serializablePathData.pathNumber = pathData.pathNumber;
+            serializablePathData.pathName = pathData.pathName;
+            serializablePathData.pathDescription = pathData.pathDescription;
+            serializablePathData.pathDifficulty = pathData.pathDifficulty;
+            serializablePathData.rewardName = pathData.rewardName;
+            serializablePathData.rewardAmmount = pathData.rewardAmmount;
+            serializablePathData.rewardType = pathData.rewardType;
+
+            save.w2PathDatas.Add(serializablePathData);
+        }
+
+        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().w3PathDatas)
+        {
+            SerializablePathData serializablePathData = new SerializablePathData();
+
+            serializablePathData.pathNumber = pathData.pathNumber;
+            serializablePathData.pathName = pathData.pathName;
+            serializablePathData.pathDescription = pathData.pathDescription;
+            serializablePathData.pathDifficulty = pathData.pathDifficulty;
+            serializablePathData.rewardName = pathData.rewardName;
+            serializablePathData.rewardAmmount = pathData.rewardAmmount;
+            serializablePathData.rewardType = pathData.rewardType;
+
+            save.w3PathDatas.Add(serializablePathData);
+        }
     }
 
     //public void SetPathData()

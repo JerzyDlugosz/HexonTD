@@ -29,7 +29,8 @@ public class BuyTowerLogic : MonoBehaviour
     public Transform descriptionPanel;
 
     //int[,] tilesToCheck = new int[,] { {-1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
-    int[,] tilesToCheck = new int[,] { { -1, -1 }, { 0, -1 }, { -1, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 } };
+    int[,] tilesToCheckForOddZ = new int[,] { { -1, -1 }, { 0, -1 }, { -1, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 } };
+    int[,] tilesToCheckForEvenZ = new int[,] { { 0, -1 }, { 1, -1 }, { -1, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } };
     int[] connectorIndexes = new int[] { 5, 4, 0, 3, 1, 2 };
     void Start()
     {
@@ -257,12 +258,22 @@ public class BuyTowerLogic : MonoBehaviour
         PlaceableTileData tileData = tile.GetComponentInParent<PlaceableTileData>();
         GameObject[,] placeableTiles = GameObject.Find("GameControllerObject").GetComponent<TileList>().placeableTileArray;
         tower.GetComponentInChildren<HeroTowerStats>().ResetConnectedTowers();
+        int[,] tileArray;
+        if (tileData.tileZCoord % 2 == 0)
+        {
+            tileArray = tilesToCheckForEvenZ;
+        }
+        else
+        {
+            tileArray = tilesToCheckForOddZ;
+        }
 
         for (int i = 0; i < 6; i++)
         {
             GameObject adjacentTile;
 
-            adjacentTile = placeableTiles[tileData.tileXCoord + tilesToCheck[i, 0], tileData.tileZCoord + tilesToCheck[i, 1]];
+            
+            adjacentTile = placeableTiles[tileData.tileXCoord + tileArray[i, 0], tileData.tileZCoord + tileArray[i, 1]];
             Debug.Log(adjacentTile);
             if (adjacentTile != null)
             {

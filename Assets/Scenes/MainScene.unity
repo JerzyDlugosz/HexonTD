@@ -2259,7 +2259,7 @@ GameObject:
   - component: {fileID: 115865459}
   - component: {fileID: 115865458}
   m_Layer: 5
-  m_Name: Basic Tower (1)
+  m_Name: Basic Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33960,8 +33960,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39e8800efa1be7849b6f78eb2a5a75e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waves: 0500000004000000030000000400000005000000
-  waveType: 0000000001000000020000000100000000000000
   availableEnemies: {fileID: 11400000, guid: 8df34a9f090a76c4ea62299c0525ed0a, type: 2}
   enemiesOnScreen: []
   cardTemplate: {fileID: 3050774047262911696, guid: 911a677559110fa4383ae89aba2fd9e7, type: 3}
@@ -33974,7 +33972,7 @@ MonoBehaviour:
   waveNumber: 0
   maxCards: 5
   enemyNumber: 0
-  spawnSpeed: 5
+  spawnSpeed: 1
   lastEnemySpawned: 0
 --- !u!114 &1548959155
 MonoBehaviour:

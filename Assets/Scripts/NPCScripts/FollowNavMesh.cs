@@ -82,8 +82,9 @@ public class FollowNavMesh : MonoBehaviour
     {
         if (!isEnemyDead)
         {
-            this.GetComponent<EnemyStats>().health -= damage;
-            this.GetComponentInChildren<Slider>().value -= damage;
+            float takenDamage = damage / GetComponent<EnemyStats>().armor;
+            this.GetComponent<EnemyStats>().health -= takenDamage;
+            this.GetComponentInChildren<Slider>().value -= takenDamage;
             if (this.GetComponent<EnemyStats>().health <= 0)
             {
                 isEnemyDead = true;

@@ -6,5 +6,5 @@ using UnityEngine;
 public class AvailableEnemies : ScriptableObject
 {
     [SerializeField]
-    public List<GameObject> EnemyPrefabs;
+    public List<Enemy> Enemies;
 }

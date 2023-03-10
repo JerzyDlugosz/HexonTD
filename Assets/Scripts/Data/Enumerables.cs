@@ -69,3 +69,22 @@ public enum MapTypes
     Desert,
     Fungal
 }
+
+public enum WaveTemplate
+{
+    Normal1,
+    Normal2,
+    Normal3,
+    Special1,
+    Special2,
+    Special3,
+    Easy1,
+    Easy2,
+    Easy3,
+    Medium1,
+    Medium2,
+    Medium3,
+    Hard1,
+    Hard2,
+    Hard3
+}

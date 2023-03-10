@@ -1,3 +1,4 @@
+using Microsoft.SqlServer.Server;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,8 @@ public class PlayerData : MonoBehaviour
     public float startingMaterials;
     public float maxCardDraw;
 
+    public int currentWorld = 0;
+
     public void SetData(PlayerData data)
     {
         BasicTowerModifiers = data.BasicTowerModifiers;
@@ -23,5 +26,6 @@ public class PlayerData : MonoBehaviour
         HeroTowerModifiers = data.HeroTowerModifiers;
         startingMaterials = data.startingMaterials;
         maxCardDraw = data.maxCardDraw;
+        currentWorld = data.currentWorld;
     }
 }

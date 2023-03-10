@@ -16,7 +16,7 @@ public class StartGame : MonoBehaviour
     [SerializeField]
     private PlayableMaps playableMaps;
     [SerializeField]
-    MapData mapData;
+    public MapData mapData;
     [SerializeField]
     private Button startWaveButton;
 
@@ -251,28 +251,28 @@ public class StartGame : MonoBehaviour
             {
                 case MapTypes.Plains:
                     decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.plainsTileMaterial;
-                    if (decorNumber > 0)
+                    if (decorNumber >= 0)
                     {
                         Instantiate(decorations.plainsDecoration[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
                     }
                     break;
                 case MapTypes.Forest:
                     decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.forestTileMaterial;
-                    if (decorNumber > 0)
+                    if (decorNumber >= 0)
                     {
                         Instantiate(decorations.forestDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
                     }
                     break;
                 case MapTypes.Taiga:
                     decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.taigaTileMaterial;
-                    if (decorNumber > 0)
+                    if (decorNumber >= 0)
                     {
                         Instantiate(decorations.taigaDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
                     }
                     break;
                 case MapTypes.Tundra:
                     decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.tundraTileMaterial;
-                    if (decorNumber > 0)
+                    if (decorNumber >= 0)
                     {
                         Instantiate(decorations.tundraDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
                     }
@@ -286,7 +286,7 @@ public class StartGame : MonoBehaviour
                     break;
                 case MapTypes.Fungal:
                     decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.fungalTileMaterial;
-                    if (decorNumber > 0)
+                    if (decorNumber >= 0)
                     {
                         Instantiate(decorations.fungalDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
                     }
@@ -371,36 +371,33 @@ public class StartGame : MonoBehaviour
         isAnimationRunning = true;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (isAnimationRunning)
         {
-            if(i < 100)
+            if(i < 50)
             {
-                fadeToBlackImage.color = new Color(fadeToBlackImage.color.r, fadeToBlackImage.color.g, fadeToBlackImage.color.b, (float)(100 - i) / 100);
+                fadeToBlackImage.color = new Color(fadeToBlackImage.color.r, fadeToBlackImage.color.g, fadeToBlackImage.color.b, (float)(100 - i*2) / 100);
             }
-            i++;
-            if (i == 100)
+
+            if (i == 50)
             {
                 fadeToBlackImage.enabled = false;
                 Debug.Log("ay!");
             }
 
-            if(i < 300) 
+            if(i < 100) 
             {
-                Camera.main.orthographicSize = 20f - i/30f;
+                Camera.main.orthographicSize = 20f - i/6f;
             }
 
-            //if (i < 300 && i > 250)
-            //{
-            //    Camera.main.orthographicSize = 20f - i / 30f;
-            //}
-
-            if (i == 300)
+            if (i == 100)
             {
                 Camera.main.GetComponent<CameraControl>().enabled = true;
                 isAnimationRunning = false;
-            }    
+            }
+
+            i++;
         }
     }
 }
