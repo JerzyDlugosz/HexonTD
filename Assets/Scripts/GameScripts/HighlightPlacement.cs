@@ -19,6 +19,9 @@ public class HighlightPlacement : MonoBehaviour
     public bool isDraggingTower = false;
 
     public string currentlyHoveredTower;
+    public GameObject hoveredTower;
+
+    public bool clicked = false;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +32,16 @@ public class HighlightPlacement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Temporary input detection
+        if(Input.GetMouseButtonDown(0)) 
+        {
+            OnClick();
+        }
 
+        if (clicked)
+        {
+            return;
+        }
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         //RaycastHit[] hits = Physics.RaycastAll(ray);
@@ -56,7 +68,6 @@ public class HighlightPlacement : MonoBehaviour
         //    NullDescription(descriptionPanel);
         //    onTile = false;
         //}
-
         if (Physics.Raycast(ray, out RaycastHit tileHit))
         {
             Debug.DrawRay(ray.origin, ray.direction, Color.red, 3f);
@@ -173,10 +184,15 @@ public class HighlightPlacement : MonoBehaviour
     {
         //if (descriptionPanel.GetComponent<DescriptionLogic>().isVisible)
         //{
-            //descriptionPanel.GetComponent<Animator>().Play("CloseDescription");
-            descriptionPanel.GetComponent<DescriptionLogic>().NullDescription();
-            //descriptionPanel.GetComponent<DescriptionLogic>().isVisible = false;
+        //descriptionPanel.GetComponent<Animator>().Play("CloseDescription");
+        //descriptionPanel.GetComponent<DescriptionLogic>().NullDescription();
+        //descriptionPanel.GetComponent<DescriptionLogic>().isVisible = false;
         //}
+
+        if(!clicked)
+        {
+            descriptionPanel.GetComponent<DescriptionLogic>().NullDescription();
+        }
     }
 
     public void SetDescription(RaycastHit hit)
@@ -184,9 +200,14 @@ public class HighlightPlacement : MonoBehaviour
         //if (!descriptionPanel.GetComponent<DescriptionLogic>().isVisible)
         //{
             //descriptionPanel.GetComponent<Animator>().Play("OpenDescription");
-            descriptionPanel.GetComponent<DescriptionLogic>().SetDescription(hit.transform.GetChild(0).gameObject);
-            //descriptionPanel.GetComponent<DescriptionLogic>().isVisible = true;
+            //descriptionPanel.GetComponent<DescriptionLogic>().SetDescription(hit.transform.GetChild(0).gameObject);
+        //descriptionPanel.GetComponent<DescriptionLogic>().isVisible = true;
         //}
+
+        if (!clicked)
+        {
+            descriptionPanel.GetComponent<DescriptionLogic>().SetDescription(hit.transform.GetChild(0).gameObject);
+        }
     }
 
     public void ResetRange()
@@ -200,5 +221,76 @@ public class HighlightPlacement : MonoBehaviour
         marker.transform.localPosition = markerHolder.position;
     }
 
+    public void OnClick()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit tileHit))
+        {
+            //if (tileHit.collider.CompareTag("Tower") && currentlyHoveredTower != tileHit.transform.name)
+            //{
+            //    if (descriptionPanel.GetComponent<DescriptionLogic>().pointerOnSpell == false)
+            //    {
+            //        NullDescription();
+            //    }
+            //    clicked = false;
+            //}
 
+            //if (tileHit.collider.CompareTag("Placeable Tile"))
+            //{
+            //    if (descriptionPanel.GetComponent<DescriptionLogic>().pointerOnSpell == false)
+            //    {
+            //        NullDescription();
+            //    }
+            //    ResetRange();
+            //    clicked = false;
+            //}
+            if (tileHit.collider.CompareTag("Tower"))
+            {
+                SetDescription(tileHit);
+                range.transform.position = tileHit.transform.GetChild(0).position;
+                range.transform.localScale = new Vector3(tileHit.transform.GetChild(0).GetComponent<TowerStats>().range, 1f, tileHit.transform.GetChild(0).GetComponent<TowerStats>().range);
+                currentlyHoveredTower = tileHit.transform.name;
+                hoveredTower = tileHit.transform.gameObject;
+                if(hoveredTower.GetComponentInChildren<TowerStats>().target == Target.First)
+                {
+                    descriptionPanel.GetComponent<DescriptionLogic>().children[5].GetChild(1).GetChild(0).GetComponent<Image>().enabled = true;
+                    descriptionPanel.GetComponent<DescriptionLogic>().children[5].GetChild(2).GetChild(0).GetComponent<Image>().enabled = false;
+                }
+                if (hoveredTower.GetComponentInChildren<TowerStats>().target == Target.Nearest)
+                {
+                    descriptionPanel.GetComponent<DescriptionLogic>().children[5].GetChild(1).GetChild(0).GetComponent<Image>().enabled = false;
+                    descriptionPanel.GetComponent<DescriptionLogic>().children[5].GetChild(2).GetChild(0).GetComponent<Image>().enabled = true;
+                }
+                clicked = true;
+                Debug.Log($"Tower {currentlyHoveredTower} under cursor");
+            }
+            else
+            {
+                ResetMarker();
+                ResetRange();
+                NullDescription();
+                Debug.Log("Notting under cursor");
+                clicked = false;
+            }
+        }
+        else
+        {
+            ResetMarker();
+            ResetRange();
+            NullDescription();
+            clicked = false;
+        }
+    }
+
+    public void SetTargetting(int target)
+    {
+        if(target == 0)
+        {
+            hoveredTower.GetComponentInChildren<TowerStats>().target = Target.First;
+        }
+        if (target == 1)
+        {
+            hoveredTower.GetComponentInChildren<TowerStats>().target = Target.Nearest;
+        }
+    }
 }

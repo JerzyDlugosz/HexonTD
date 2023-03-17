@@ -36,3 +36,7 @@ MonoBehaviour:
   desertTileMaterial: {fileID: 2100000, guid: bc1ff4c0d5164214cb2266d254491769, type: 2}
   desertDecorations:
   - {fileID: 8882753894879613597, guid: 7a3333b5ccb558342939003db37fd52c, type: 3}
+  volcanicTileMaterial: {fileID: 2100000, guid: d3da851a98f6f6346b1b8919f7fd3ee7, type: 2}
+  volcanicDecorations: []
+  savannaTileMaterial: {fileID: 2100000, guid: 1e2714c062da4914298eb0e74e764b62, type: 2}
+  savannaDecorations: []

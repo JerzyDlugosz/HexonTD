@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -12,6 +13,9 @@ public class ButtonScript : MonoBehaviour
     GameStateManager gameStateManager;
     public WorldTransformation worldTransformation;
     bool confirmationClick = false;
+
+    [SerializeField]
+    private GameObject Alert;
 
     void Start()
     {
@@ -62,21 +66,27 @@ public class ButtonScript : MonoBehaviour
         gameStateManager.LoadSceneAndResetSave(sceneNumber);
     }
 
-    public void ResetSaveSetPathAndLoadScene(int sceneNumber)
+    public void CheckForPreviousSave()
     {
-        if(confirmationClick)
-        {
-            SetPaths();
-            gameStateManager.SavePlayerData();
-            LoadScene(sceneNumber);
-            return;
-        }
-        if(gameStateManager.CheckForSaveData(1))
+        if (gameStateManager.CheckForSaveData(1))
         {
             Debug.Log("A save already exists! Do you want to start a new game? It will erase the old save file!");
-            confirmationClick = true;
+            Alert.SetActive(true);
+            //confirmationClick = true;
             return;
         }
+        else
+        {
+            ResetSaveSetPathAndLoadScene(3);
+        }
+    }
+
+    public void ResetSaveSetPathAndLoadScene(int sceneNumber)
+    {
+        SetPaths();
+        gameStateManager.SavePlayerData();
+        LoadScene(sceneNumber);
+        return; 
     }
 
     public void OnStartButtonClick(int sceneNumber)
@@ -105,4 +115,9 @@ public class ButtonScript : MonoBehaviour
     //{
     //    yield return new WaitForEndOfFrame();
     //}
+
+    public void LoadLeaderboardData()
+    {
+        gameStateManager.LoadLeaderboardData();
+    }
 }

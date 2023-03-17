@@ -582,6 +582,7 @@ MonoBehaviour:
   pathArrowCanvas: {fileID: 0}
   decorationTilesParent: {fileID: 7528112854884340010}
   PathTilesParent: {fileID: 8798427728096566597}
+  EnemyTypeForWave: []
 --- !u!1 &7528112856858536326
 GameObject:
   m_ObjectHideFlags: 0
@@ -22070,7 +22071,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.803
+      value: -2.197
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -23971,7 +23972,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.981
+      value: -3.019
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -24262,7 +24263,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.384284
+      value: -2.615716
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -25797,7 +25798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.56
+      value: -3.44
       objectReference: {fileID: 0}
     - target: {fileID: 3109847006304158573, guid: 47283b8deb2321e45aaefeac803ec53e, type: 3}
       propertyPath: m_LocalPosition.y

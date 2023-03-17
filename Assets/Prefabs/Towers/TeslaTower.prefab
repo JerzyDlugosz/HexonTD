@@ -246,7 +246,7 @@ MonoBehaviour:
   damage: 0.5
   range: 3
   attackSpeed: 1
-  bulletSpeed: 0
+  bulletSpeed: 1
   bulletAOESize: 0
   towerPrefab: {fileID: 0}
   towerPlaceholderPrefab: {fileID: 0}
@@ -258,6 +258,9 @@ MonoBehaviour:
   towerSprite: {fileID: 0}
   price: 5
   isStationary: 1
+  isPassive: 0
+  passiveStat: 0
+  target: 0
 --- !u!114 &4010101617577401174
 MonoBehaviour:
   m_ObjectHideFlags: 0

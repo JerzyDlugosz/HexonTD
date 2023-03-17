@@ -53,22 +53,6 @@ public class WorldTransformation : MonoBehaviour
 
     public void OnClick()
     {
-        //EasterEgg Start
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hitInfo))
-        {
-            if (hitInfo.transform.CompareTag("EasterEgg"))
-            {
-                description.GetChild(0).GetComponent<TextMeshProUGUI>().text = "M";
-                description.GetChild(1).GetComponent<TextMeshProUGUI>().text = "A";
-                description.GetChild(2).GetComponent<TextMeshProUGUI>().text = "T";
-                description.GetChild(3).GetComponent<TextMeshProUGUI>().text = "E";
-                description.GetChild(4).GetComponent<TextMeshProUGUI>().text = "U";
-                description.GetChild(5).GetComponent<TextMeshProUGUI>().text = "SZ";
-            }
-        }
-        //EasterEgg End
-
         if (isAnimationRunning)
         {
             return;
@@ -91,7 +75,7 @@ public class WorldTransformation : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (isAnimationRunning)
         {
@@ -124,7 +108,7 @@ public class WorldTransformation : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (isAnimationRunning)
         {
@@ -143,6 +127,7 @@ public class WorldTransformation : MonoBehaviour
         {
 
             isAnimationRunning = false;
+            ResetFlags();
             return;
         }
 
@@ -154,7 +139,7 @@ public class WorldTransformation : MonoBehaviour
         if (!hitInfo.transform.GetComponent<RaycastData>().isRaycasted)
         {
             hitInfo.transform.GetComponent<RaycastData>().isRaycasted = true;
-            hitInfo.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
+            //hitInfo.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
             currentTile = hitInfo.transform;
             SetDescription(hitInfo.transform.GetComponent<PathData>());
             //if (alert == null)
@@ -168,7 +153,7 @@ public class WorldTransformation : MonoBehaviour
 
     void ResetFlags()
     {
-        currentTile.localScale = new Vector3(1f, 1f, 1f);
+        //currentTile.localScale = new Vector3(1f, 1f, 1f);
         currentTile.GetComponent<RaycastData>().isRaycasted = false;
         currentTile = null;
         NullDescription();

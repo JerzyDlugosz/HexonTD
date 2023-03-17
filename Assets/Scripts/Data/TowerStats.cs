@@ -29,4 +29,12 @@ public class TowerStats : MonoBehaviour
     public bool isPassive;
 
     public float passiveStat;
+
+    public Target target;
+}
+
+public enum Target
+{
+    First,
+    Nearest
 }

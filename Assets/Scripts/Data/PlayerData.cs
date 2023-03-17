@@ -16,6 +16,11 @@ public class PlayerData : MonoBehaviour
     public float maxCardDraw;
 
     public int currentWorld = 0;
+    public float score = 0f;
+
+    public int allEnemiesKilled;
+    public int allResourcesSaved;
+    public int allTimeSpent;
 
     public void SetData(PlayerData data)
     {
@@ -27,5 +32,9 @@ public class PlayerData : MonoBehaviour
         startingMaterials = data.startingMaterials;
         maxCardDraw = data.maxCardDraw;
         currentWorld = data.currentWorld;
-    }
+        score = data.score;
+        allEnemiesKilled = data.allEnemiesKilled;
+        allResourcesSaved = data.allResourcesSaved;
+        allTimeSpent = data.allTimeSpent;
+}
 }

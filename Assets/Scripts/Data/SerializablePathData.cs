@@ -11,4 +11,5 @@ public class SerializablePathData
     public int rewardAmmount;
     public RewardType rewardType;
     public bool isCompleted;
+    public bool isActive;
 }

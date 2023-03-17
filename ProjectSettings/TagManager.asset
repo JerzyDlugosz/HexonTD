@@ -14,6 +14,8 @@ TagManager:
   - Card Space
   - ResetFlags
   - EasterEgg
+  - EnemyCenter
+  - Spawn
   layers:
   - Default
   - TransparentFX

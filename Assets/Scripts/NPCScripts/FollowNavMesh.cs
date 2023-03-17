@@ -55,10 +55,11 @@ public class FollowNavMesh : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        distanceText.text = $"Distance: {Extensions.GetPathRemainingDistance(agent)}";
-    }
+    //Debug Only!
+    //private void Update()
+    //{
+    //    distanceText.text = $"Distance: {Extensions.GetPathRemainingDistance(agent)}";
+    //}
 
     private void OnTriggerEnter(Collider other)
     {

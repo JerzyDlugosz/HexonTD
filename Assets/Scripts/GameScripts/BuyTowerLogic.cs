@@ -23,6 +23,8 @@ public class BuyTowerLogic : MonoBehaviour
     TowerStats towerStats;
 
     public GameObject grayOutPanel;
+    [SerializeField]
+    private GameObject megaGrayOutPanel;
     public GameObject Marker;
 
     public Transform zoomedCardHolder;
@@ -55,7 +57,7 @@ public class BuyTowerLogic : MonoBehaviour
         GameObject.Find("GameControllerObject").GetComponent<HighlightPlacement>().isDraggingTower = true;
         if (Marker.transform.childCount < 7 && !grayOutPanel.activeSelf)
         {
-            towerPlaceholder = GameObject.Instantiate(towerPlaceholderPrefab);
+            towerPlaceholder = Instantiate(towerPlaceholderPrefab);
             towerPlaceholder.transform.position = Marker.transform.position;
             towerPlaceholder.transform.SetParent(Marker.transform);
         }
@@ -81,6 +83,11 @@ public class BuyTowerLogic : MonoBehaviour
                         PlaceableTileData tileData = hit.transform.GetComponentInParent<PlaceableTileData>();
                         if(towerStats.towerType == TowerType.Hero)
                         {
+
+
+                            megaGrayOutPanel.SetActive(true);
+                            GetComponent<Button>().interactable = false;
+                            Destroy(GetComponent<EventTrigger>());
 
                             tileData.isHeroTowerOnTile = true;
 
@@ -151,9 +158,9 @@ public class BuyTowerLogic : MonoBehaviour
         tower.GetComponentInChildren<TowerStats>().towerName = towerStats.towerName;
         tower.GetComponentInChildren<TowerStats>().towerType = towerStats.towerType;
         tower.GetComponentInChildren<TowerStats>().bulletSpeed = towerStats.bulletSpeed;
-        tower.GetComponentInChildren<ShootScript>().bulletSpeed = towerStats.bulletSpeed;
+        tower.GetComponentInChildren<Targetting>().bulletSpeed = towerStats.bulletSpeed;
         tower.GetComponentInChildren<TowerStats>().bulletAOESize = towerStats.bulletAOESize;
-        tower.GetComponentInChildren<ShootScript>().bulletAOESize = towerStats.bulletAOESize;
+        tower.GetComponentInChildren<Targetting>().bulletAOESize = towerStats.bulletAOESize;
     }
 
     void RemoveCard()
@@ -296,7 +303,7 @@ public class BuyTowerLogic : MonoBehaviour
                     if (adjacentTileData.towerType == TowerType.Tesla && !adjacentTileData.alreadyCheckedForBonuses)
                     {
                         tower.GetComponentInChildren<HeroTowerStats>().connectedTeslaTowers++;
-                        tower.GetComponentInChildren<ShootScript>().bulletSpeed *= tower.GetComponentInChildren<HeroTowerStats>().speedMultiplierModifier;
+                        tower.GetComponentInChildren<TowerStats>().attackSpeed *= tower.GetComponentInChildren<HeroTowerStats>().speedMultiplierModifier;
                         adjacentTileData.alreadyCheckedForBonuses = true;
                     }
                     if (adjacentTileData.towerType == TowerType.Railgun && !adjacentTileData.alreadyCheckedForBonuses)
@@ -311,9 +318,9 @@ public class BuyTowerLogic : MonoBehaviour
                         tower.GetComponentInChildren<HeroTowerStats>().connectedMissleTowers++;
                         if (tower.GetComponentInChildren<HeroTowerStats>().connectedMissleTowers == 1)
                         {
-                            tower.GetComponentInChildren<ShootScript>().bulletPrefab = tower.GetComponentInChildren<HeroTowerStats>().misslePrefab;
+                            tower.GetComponentInChildren<Targetting>().bulletPrefab = tower.GetComponentInChildren<HeroTowerStats>().misslePrefab;
                         }
-                        tower.GetComponentInChildren<ShootScript>().bulletAOESize += tower.GetComponentInChildren<HeroTowerStats>().missleRangeAddModifier;
+                        tower.GetComponentInChildren<Targetting>().bulletAOESize += tower.GetComponentInChildren<HeroTowerStats>().missleRangeAddModifier;
                         adjacentTileData.alreadyCheckedForBonuses = true;
                     }
 

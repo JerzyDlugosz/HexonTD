@@ -24,4 +24,9 @@ public class Save
     public bool[] w3BeatenPaths = new bool[10];
 
     public int currentWorld;
+    public float score;
+
+    public int allEnemiesKilled;
+    public int allResourcesSaved;
+    public int allTimeSpent;
 }

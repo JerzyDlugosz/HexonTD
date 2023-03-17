@@ -42,6 +42,20 @@ public class StartGame : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI DebugArrayText;
 
+
+    private Texture2D noiseTex;
+    // Width and height of the texture in pixels.
+    public int pixWidth;
+    public int pixHeight;
+
+    // The origin of the sampled area in the plane.
+    public float xOrg;
+    public float yOrg;
+
+    // The number of cycles of the basic noise pattern that are repeated
+    // over the width and height of the texture.
+    public float scale = 1.0F;
+
     void Start()
     {
         SetStartingResources();
@@ -49,6 +63,7 @@ public class StartGame : MonoBehaviour
         GenerateMap();
         SetEnemyNavMesh();
         UpdateTileList();
+        RandomizeTileHeight();
         DecorateMap();
         SetPathArrows();
         StartPathArrowsAnimation();
@@ -141,23 +156,25 @@ public class StartGame : MonoBehaviour
         this.GetComponent<TileList>().placeableTileArray = placeableTileArray;
         this.GetComponent<TileList>().tiles = mapData.placeableTiles;
 
-        for (int i = 0; i < mapData.xSize; i++)
-        {
-            for (int j = 0; j < mapData.zSize; j++)
-            {
-                if (placeableTileArray[i, j] != null)
-                {
-                    DebugArrayText.text += "1 ";
-                }
-                else
-                {
-                    DebugArrayText.text +="0 ";
-                }
-                Debug.Log(placeableTileArray[i, j]);
+        //For debugging purposes
+        //for (int i = 0; i < mapData.xSize; i++)
+        //{
+        //    for (int j = 0; j < mapData.zSize; j++)
+        //    {
+        //        if (placeableTileArray[i, j] != null)
+        //        {
+        //            DebugArrayText.text += "1 ";
+        //        }
+        //        else
+        //        {
+        //            DebugArrayText.text +="0 ";
+        //        }
+        //        Debug.Log(placeableTileArray[i, j]);
 
-            }
-            DebugArrayText.text += "\n";
-        }
+        //    }
+        //    DebugArrayText.text += "\n";
+        //}
+        //
     }
 
     private void UpdateDecorationTileList()
@@ -198,6 +215,12 @@ public class StartGame : MonoBehaviour
                 break;
             case MapTypes.Fungal:
                 ammount = decorations.fungalDecorations.Count;
+                break;
+            case MapTypes.Volcanic:
+                ammount = decorations.volcanicDecorations.Count;
+                break;
+            case MapTypes.Savanna:
+                ammount = decorations.savannaDecorations.Count;
                 break;
         }
 
@@ -291,6 +314,20 @@ public class StartGame : MonoBehaviour
                         Instantiate(decorations.fungalDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
                     }
                     break;
+                case MapTypes.Volcanic:
+                    decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.volcanicTileMaterial;
+                    if (decorNumber >= 0)
+                    {
+                        Instantiate(decorations.volcanicDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
+                    }
+                    break;
+                case MapTypes.Savanna:
+                    decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform.GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = decorations.savannaTileMaterial;
+                    if (decorNumber >= 0)
+                    {
+                        Instantiate(decorations.savannaDecorations[decorNumber], decorationTileArray[i % mapData.xSize, i / mapData.zSize].transform);
+                    }
+                    break;
             }
 
             //if (mapType == MapTypes.Plains)
@@ -367,6 +404,7 @@ public class StartGame : MonoBehaviour
     private void ZoomInAnim()
     {
         Camera.main.GetComponent<CameraControl>().enabled = false;
+        Camera.main.transform.parent.parent.position = mapData.destination.transform.position;
         fadeToBlackImage.enabled = true;
         isAnimationRunning = true;
     }
@@ -388,7 +426,7 @@ public class StartGame : MonoBehaviour
 
             if(i < 100) 
             {
-                Camera.main.orthographicSize = 20f - i/6f;
+                Camera.main.orthographicSize = 20f - i/20f;
             }
 
             if (i == 100)
@@ -399,5 +437,38 @@ public class StartGame : MonoBehaviour
 
             i++;
         }
+    }
+
+    private void RandomizeTileHeight()
+    {
+
+        pixWidth = mapData.xSize;
+        pixHeight = mapData.zSize;
+        noiseTex = new Texture2D(pixWidth, pixHeight);
+
+        for (int x = 0; x < mapData.xSize; x++)
+        {
+            for (int y = 0; y < mapData.zSize; y++)
+            {
+                if (decorationTileArray[x,y] != null)
+                {
+                    //float xCoord = xOrg + x / noiseTex.width * scale;
+                    //float yCoord = yOrg + y / noiseTex.height * scale;
+                    float sample = Mathf.PerlinNoise((float)x/mapData.xSize * scale, (float)y/mapData.zSize * scale);
+                    Debug.Log(sample);
+                    float yPos = (((int)(sample * 4 + 1)) / 4f) - 0.5f;
+                    decorationTileArray[x,y].transform.position = new Vector3(decorationTileArray[x, y].transform.position.x, yPos, decorationTileArray[x, y].transform.position.z);
+                }
+            }
+        }
+
+        //foreach (GameObject tile in decorationTileArray)
+        //{
+        //    if(tile != null)
+        //    {
+        //        rand = Random.Range(-4, 1);
+        //        tile.transform.position = new Vector3(tile.transform.position.x, (float)rand / 8, tile.transform.position.z);
+        //    }
+        //}
     }
 }

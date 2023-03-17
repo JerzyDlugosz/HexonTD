@@ -66,5 +66,23 @@ public class BulletLogic : MonoBehaviour
             }
             Destroy(this.gameObject);
         }
+        if (other.CompareTag("Spawn"))
+        {
+            if (bulletType == BulletType.missile)
+            {
+                //target.GetComponent<FollowNavMesh>().TakeDamage(bulletDamage);
+                this.GetComponentInChildren<ExplosionScript>().OnBulletInpact(bulletDamage);
+            }
+            else if (bulletType == BulletType.lightning)
+            {
+                //target.GetComponent<FollowNavMesh>().TakeDamage(bulletDamage);
+                this.GetComponentInChildren<LightningScript>().OnBulletInpact(bulletDamage);
+            }
+            else
+            {
+                target.GetComponent<FollowNavMesh>().TakeDamage(bulletDamage);
+            }
+            Destroy(this.gameObject);
+        }
     }
 }

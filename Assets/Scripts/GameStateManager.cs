@@ -19,6 +19,11 @@ public class GameStateManager : MonoBehaviour
     List<List<PathDataNotMono>> worldPathList;
 
     private int[] sceneNumbers = { 3, 4, 5};
+
+    public bool isRunFinished = true;
+
+    private SavingAndLoading savingAndLoading;
+    public LeaderboardData leaderboardDataGlobal;
     private void Awake()
     {
         if(instance == null)
@@ -28,6 +33,7 @@ public class GameStateManager : MonoBehaviour
             playerData = GetComponent<PlayerData>();
             pathData = GetComponent<PathData>();
             worldPathData = GetComponent<WorldPathData>();
+            savingAndLoading = GetComponent<SavingAndLoading>();
         }
         else
         {
@@ -63,9 +69,6 @@ public class GameStateManager : MonoBehaviour
         beatenPathsList[playerData.currentWorld][pathData.pathNumber] = true;
         worldPathList[playerData.currentWorld][pathData.pathNumber].isCompleted = true;
 
-
-        Debug.Log($"{playerData.currentWorld}, {pathData.pathNumber}, {beatenPathsList[playerData.currentWorld][pathData.pathNumber]}, {worldPathData.w2BeatenPaths[pathData.pathNumber]}");
-
         int randomCapturedTile = RandomizeCapturedTile(playerData.currentWorld);
 
         if(randomCapturedTile != -1)
@@ -73,23 +76,7 @@ public class GameStateManager : MonoBehaviour
             beatenPathsList[playerData.currentWorld][randomCapturedTile] = true;
             worldPathList[playerData.currentWorld][randomCapturedTile].isCompleted = true;
         }
-
-        int temp = 0;
-
-        foreach (bool beatenPath in beatenPathsList[playerData.currentWorld])
-        {
-            if(!beatenPath)
-            {
-                temp += 1;
-            }
-        }
-
-        if(temp == 0)
-        {
-            playerData.currentWorld += 1;
-        }
-
-
+       
         int i = 0;
         Modifiers = new List<List<float>>()
         {
@@ -131,11 +118,20 @@ public class GameStateManager : MonoBehaviour
 
         Debug.Log($"Rolled Upgrade : {GetComponent<PathData>().rewardType} {i}");
 
-        SavePlayerData();
-
-        if(randomCapturedTile == -1)
+        if (randomCapturedTile == -1)
         {
-            //LoadScene(sceneNumbers[playerData.currentWorld]);
+            playerData.currentWorld += 1;
+        }
+
+        if (playerData.currentWorld == 3)
+        {
+            isRunFinished = true;
+            SavePlayerData();
+            SaveLeaderboardData();
+        }
+        else
+        {
+            SavePlayerData();
         }
 
         LoadScene(3);
@@ -147,9 +143,12 @@ public class GameStateManager : MonoBehaviour
 
         for (int i = 0; i < beatenPathsList[currentWorld].Length; i++)
         {
-            if (!beatenPathsList[currentWorld][i])
+            if (worldPathList[currentWorld][i].isActive)
             {
-                list.Add(i);
+                if (!beatenPathsList[currentWorld][i])
+                {
+                    list.Add(i);
+                }
             }
         }
 
@@ -210,7 +209,7 @@ public class GameStateManager : MonoBehaviour
 
     public void LoadSceneWithPlayerData()
     {
-        if (!LoadSaveFile(SaveFile))
+        if (!savingAndLoading.GetSaveFile(SaveFile, playerData))
         {
             return;
         }
@@ -219,7 +218,7 @@ public class GameStateManager : MonoBehaviour
 
     public void LoadPlayerData()
     {
-        LoadSaveFile(SaveFile);
+        savingAndLoading.GetSaveFile(SaveFile, playerData);
     }
     public void SavePlayerData()
     {
@@ -236,109 +235,6 @@ public class GameStateManager : MonoBehaviour
         return false;
     }
 
-    public bool LoadSaveFile(int saveFile)
-    {
-        string saveFilePath = Path.Combine(Application.persistentDataPath, $"gamesave{saveFile}.json");
-        if (File.Exists(saveFilePath))
-        {
-            string jsonText = File.ReadAllText(saveFilePath);
-            Save save = new Save();
-            JsonUtility.FromJsonOverwrite(jsonText, save);
-
-            playerData.BasicTowerModifiers = save.BasicTowerModifiers;
-            playerData.MissileTowerModifiers = save.MissileTowerModifiers;
-            playerData.TeslaTowerModifiers = save.TeslaTowerModifiers;
-            playerData.RailgunTowerModifiers = save.RailgunTowerModifiers;
-            playerData.HeroTowerModifiers = save.HeroTowerModifiers;
-            playerData.startingMaterials = save.startingMaterials;
-            playerData.maxCardDraw = save.maxCardDraw;
-            playerData.currentWorld = save.currentWorld;
-
-            GetComponent<WorldPathData>().w1BeatenPaths = save.w1BeatenPaths;
-            GetComponent<WorldPathData>().w2BeatenPaths = save.w2BeatenPaths;
-            GetComponent<WorldPathData>().w3BeatenPaths = save.w3BeatenPaths;
-
-            foreach (SerializablePathData saveData in save.w1PathDatas)
-            {
-                PathDataNotMono pathData = new PathDataNotMono();
-
-                pathData.pathNumber = saveData.pathNumber;
-                pathData.pathName = saveData.pathName;
-                pathData.pathDescription = saveData.pathDescription;
-                pathData.pathDifficulty = saveData.pathDifficulty;
-                pathData.rewardName = saveData.rewardName;
-                pathData.rewardAmmount = saveData.rewardAmmount;
-                pathData.rewardType = saveData.rewardType;
-
-                GetComponent<WorldPathData>().w1PathDatas.Add(pathData);
-            }
-
-            foreach (SerializablePathData saveData in save.w2PathDatas)
-            {
-                PathDataNotMono pathData = new PathDataNotMono();
-
-                pathData.pathNumber = saveData.pathNumber;
-                pathData.pathName = saveData.pathName;
-                pathData.pathDescription = saveData.pathDescription;
-                pathData.pathDifficulty = saveData.pathDifficulty;
-                pathData.rewardName = saveData.rewardName;
-                pathData.rewardAmmount = saveData.rewardAmmount;
-                pathData.rewardType = saveData.rewardType;
-
-                GetComponent<WorldPathData>().w2PathDatas.Add(pathData);
-            }
-
-            foreach (SerializablePathData saveData in save.w3PathDatas)
-            {
-                PathDataNotMono pathData = new PathDataNotMono();
-
-                pathData.pathNumber = saveData.pathNumber;
-                pathData.pathName = saveData.pathName;
-                pathData.pathDescription = saveData.pathDescription;
-                pathData.pathDifficulty = saveData.pathDifficulty;
-                pathData.rewardName = saveData.rewardName;
-                pathData.rewardAmmount = saveData.rewardAmmount;
-                pathData.rewardType = saveData.rewardType;
-
-                GetComponent<WorldPathData>().w3PathDatas.Add(pathData);
-            }
-
-            Debug.Log("Game Loaded");
-            return true;
-        }
-        else
-        {
-            Debug.Log("No game saved!");
-            return false;
-        }
-
-        //if (File.Exists(Application.persistentDataPath + $"/gamesave{saveFile}.txt"))
-        //{
-        //    BinaryFormatter bf = new BinaryFormatter();
-        //    FileStream file = File.Open(Application.persistentDataPath + $"/gamesave{saveFile}.txt", FileMode.Open);
-        //    Save save = (Save)bf.Deserialize(file);
-        //    file.Close();
-
-        //    GetComponent<PlayerData>().BasicTowerModifiers = save.BasicTowerModifiers;
-        //    GetComponent<PlayerData>().MissileTowerModifiers = save.MissileTowerModifiers;
-        //    GetComponent<PlayerData>().TeslaTowerModifiers = save.TeslaTowerModifiers;
-        //    GetComponent<PlayerData>().RailgunTowerModifiers = save.RailgunTowerModifiers;
-        //    GetComponent<PlayerData>().HeroTowerModifiers = save.HeroTowerModifiers;
-        //    GetComponent<PlayerData>().startingMaterials = save.startingMaterials;
-        //    GetComponent<PlayerData>().maxCardDraw = save.maxCardDraw;
-
-        //    GetComponent<WorldPathData>().pathDatas = save.pathDatas;
-        //    GetComponent<WorldPathData>().beatenPaths = save.beatenPaths;
-
-
-        //    Debug.Log("Game Loaded");
-        //}
-        //else
-        //{
-        //    Debug.Log("No game saved!");
-        //}
-    }
-
     public void SaveGameFile(int saveFile)
     {
         string saveFilePath = Path.Combine(Application.persistentDataPath, $"gamesave{saveFile}.json");
@@ -347,106 +243,20 @@ public class GameStateManager : MonoBehaviour
         string json = JsonUtility.ToJson(save);
         File.WriteAllText(saveFilePath, json);
 
-        //Save save = CreateSaveGameObject();
-        //BinaryFormatter bf = new BinaryFormatter();
-        //FileStream file = File.Create
-        //    (Application.persistentDataPath + $"/gamesave{saveFile}.txt");
-        //bf.Serialize(file, save);
-        //file.Close();
-
         Debug.Log($"Game Saved in {saveFilePath}");
     }
 
     Save CreateSaveGameObject()
     {
         Save save = new Save();
-        SetSaveData(save);
+        savingAndLoading.SetSaveFile(save, playerData);
         return save;
     }
-
-    public void SetSaveData(Save save)
-    {
-        save.BasicTowerModifiers = playerData.BasicTowerModifiers;
-        save.MissileTowerModifiers = playerData.MissileTowerModifiers;
-        save.TeslaTowerModifiers = playerData.TeslaTowerModifiers;
-        save.RailgunTowerModifiers = playerData.RailgunTowerModifiers;
-        save.HeroTowerModifiers = playerData.HeroTowerModifiers;
-        save.startingMaterials = playerData.startingMaterials;
-        save.maxCardDraw = playerData.maxCardDraw;
-        save.currentWorld = playerData.currentWorld;
-
-
-        save.w1BeatenPaths = GetComponent<WorldPathData>().w1BeatenPaths;
-        save.w2BeatenPaths = GetComponent<WorldPathData>().w2BeatenPaths;
-        save.w3BeatenPaths = GetComponent<WorldPathData>().w3BeatenPaths;
-
-
-        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().w1PathDatas)
-        {
-            SerializablePathData serializablePathData = new SerializablePathData();
-
-            serializablePathData.pathNumber = pathData.pathNumber;
-            serializablePathData.pathName = pathData.pathName;
-            serializablePathData.pathDescription = pathData.pathDescription;
-            serializablePathData.pathDifficulty = pathData.pathDifficulty;
-            serializablePathData.rewardName = pathData.rewardName;
-            serializablePathData.rewardAmmount = pathData.rewardAmmount;
-            serializablePathData.rewardType = pathData.rewardType;
-
-            save.w1PathDatas.Add(serializablePathData);
-        }
-
-        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().w2PathDatas)
-        {
-            SerializablePathData serializablePathData = new SerializablePathData();
-
-            serializablePathData.pathNumber = pathData.pathNumber;
-            serializablePathData.pathName = pathData.pathName;
-            serializablePathData.pathDescription = pathData.pathDescription;
-            serializablePathData.pathDifficulty = pathData.pathDifficulty;
-            serializablePathData.rewardName = pathData.rewardName;
-            serializablePathData.rewardAmmount = pathData.rewardAmmount;
-            serializablePathData.rewardType = pathData.rewardType;
-
-            save.w2PathDatas.Add(serializablePathData);
-        }
-
-        foreach (PathDataNotMono pathData in GetComponent<WorldPathData>().w3PathDatas)
-        {
-            SerializablePathData serializablePathData = new SerializablePathData();
-
-            serializablePathData.pathNumber = pathData.pathNumber;
-            serializablePathData.pathName = pathData.pathName;
-            serializablePathData.pathDescription = pathData.pathDescription;
-            serializablePathData.pathDifficulty = pathData.pathDifficulty;
-            serializablePathData.rewardName = pathData.rewardName;
-            serializablePathData.rewardAmmount = pathData.rewardAmmount;
-            serializablePathData.rewardType = pathData.rewardType;
-
-            save.w3PathDatas.Add(serializablePathData);
-        }
-    }
-
-    //public void SetPathData()
-    //{
-    //    foreach(PathData pathData in GetComponent<WorldPathData>().pathDatas)
-    //    {
-    //        pathData.pathNumber = int.Parse(list[0]);
-    //        pathData.pathName = list[1];
-    //        pathData.pathDescription = list[2];
-    //        pathData.pathDifficulty = (PathDifficulty)int.Parse(list[3]);
-    //        pathData.rewardName = list[4];
-    //        pathData.rewardAmmount = int.Parse(list[5]);
-    //        pathData.rewardType = (RewardType)int.Parse(list[6]);
-    //    }
-    //}
 
     public void ExitApplication()
     {
         Application.Quit();
     }
-
-
 
     IEnumerator LoadAsyncScene(int sceneNumber)
     {
@@ -456,5 +266,38 @@ public class GameStateManager : MonoBehaviour
             Debug.Log(asyncLoad.progress);
             yield return null;
         }
+    }
+
+    LeaderboardData CreateLeaderboardData()
+    {
+        LeaderboardData leaderboardData = new LeaderboardData();
+        savingAndLoading.SetLeaderboardData(playerData, out leaderboardData);
+        return leaderboardData;
+    }
+
+    public void SaveLeaderboardData()
+    {
+        string saveFilePath = Path.Combine(Application.persistentDataPath, $"Leaderboard.json");
+
+        LeaderboardData leaderboardData = CreateLeaderboardData();
+        string json = JsonUtility.ToJson(leaderboardData);
+        File.WriteAllText(saveFilePath, json);
+
+        Debug.Log($"Leaderboards saved in: {saveFilePath}");
+    }
+
+    //public bool CkeckForLeaderboardData()
+    //{
+    //    string saveFilePath = Path.Combine(Application.persistentDataPath, $"Leaderboard.json");
+    //    if (File.Exists(saveFilePath))
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    public void LoadLeaderboardData()
+    {
+        savingAndLoading.GetLeaderboardData(playerData, out leaderboardDataGlobal);
     }
 }

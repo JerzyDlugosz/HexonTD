@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ShootScript : MonoBehaviour
+public class Targetting : MonoBehaviour
 {
     List<GameObject> enemies;
     List<GameObject> enemiesInSight = new List<GameObject>();
@@ -16,17 +16,17 @@ public class ShootScript : MonoBehaviour
 
     GameObject closestTarget = null;
 
-
     TowerStats towerStats;
-    // Start is called before the first frame update
+    private Target target;
+
+
     void Start()
     {
         enemies = GameObject.Find("GameControllerObject").GetComponent<SpawnWaves>().enemiesOnScreen;
         towerStats = this.GetComponent<TowerStats>();
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (enemiesInSight.Count > 0)
         {
@@ -36,18 +36,38 @@ public class ShootScript : MonoBehaviour
             }
             else if(closestTarget == null)
             {
-                enemiesInSight.Remove(closestTarget);
-                CheckAllDistances();
+                OnEnemiesInSightRemove(closestTarget);
+                //enemiesInSight.Remove(closestTarget);
             }
             else
             {
-                Shoot();
+                Shoot(towerStats.target);
             }
         }
     }
 
-    private void Shoot()
+    private void Shoot(Target target)
     {
+        if(target == Target.Nearest)
+        {
+            float previousDistance = 1000f;
+            foreach(GameObject enemy in enemiesInSight)
+            {
+                if(enemy == null)
+                {
+                    continue;
+                }
+                float distance = Vector3.Distance(this.transform.position, enemy.transform.position);
+                if(distance < previousDistance)
+                {
+                    previousDistance = distance;
+                    closestTarget = enemy;
+                    Debug.Log($"Distance: {distance} to: {closestTarget}");
+                }
+            }
+
+        }
+
         if(towerStats.isPassive)
         {
             return;
@@ -72,7 +92,8 @@ public class ShootScript : MonoBehaviour
             shootCooldown = 60 / towerStats.attackSpeed;
             if (closestTarget.GetComponent<EnemyStats>().health <= 0)  //enemiesInSight[0].GetComponent<EnemyStats>().
             {
-                enemiesInSight.Remove(closestTarget.gameObject);  //enemiesInSight[0].gameObject
+                OnEnemiesInSightRemove(closestTarget);
+                //enemiesInSight.Remove(closestTarget);  //enemiesInSight[0].gameObject
             }
             if (this.TryGetComponent<Animator>(out Animator component))
             {
@@ -117,8 +138,16 @@ public class ShootScript : MonoBehaviour
                 other.GetComponent<EnemyStats>().speed *= towerStats.passiveStat;
                 other.GetComponent<NavMeshAgent>().speed *= towerStats.passiveStat;
             }
-            enemiesInSight.Add(other.gameObject);
-            CheckAllDistances();
+            OnEnemiesInSightAdd(other.gameObject);
+        }
+        if (other.CompareTag("Spawn"))
+        {
+            if (towerStats.isPassive)
+            {
+                other.GetComponent<EnemyStats>().speed *= towerStats.passiveStat;
+                other.GetComponent<NavMeshAgent>().speed *= towerStats.passiveStat;
+            }
+            OnEnemiesInSightAdd(other.gameObject, true);
         }
     }
 
@@ -133,31 +162,76 @@ public class ShootScript : MonoBehaviour
             }
             if (enemiesInSight.Contains(other.gameObject))
             {
-                enemiesInSight.Remove(other.gameObject);
+                OnEnemiesInSightRemove(other.gameObject);
             }
-            CheckAllDistances();
+            return;
         }
     }
 
-    public void CheckAllDistances()
+    private void OnEnemiesInSightAdd(GameObject enemy)
     {
-        foreach (GameObject enemy in enemiesInSight)
+        enemiesInSight.Add(enemy);
+        if (enemiesInSight.Count > 1)
         {
-            if (enemy != null)
-            {
-                if (closestTarget == null)
-                {
-                    closestDistance = enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
-                    closestTarget = enemy;
-                }
+            return;
+        }
+        closestTarget = enemy;
+    }
+    /// <summary>
+    /// Force targetting system to target the enemy
+    /// </summary>
+    /// <param name="enemy"></param>
+    /// <param name="forceTarget"></param>
+    private void OnEnemiesInSightAdd(GameObject enemy, bool forceTarget)
+    {
+        enemiesInSight.Add(enemy);
+        if (forceTarget)
+        {
+            closestTarget = enemy;
+            return;
+        }
+        if(enemiesInSight.Count > 1)
+        {
+            return;
+        }
+        closestTarget = enemy;
+    }
 
-                if (closestDistance > enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd())
-                {
-                    closestDistance = enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
-                    closestTarget = enemy;
-                }
-                Debug.Log("closest distance is: " + closestDistance);
-            }
+    private void OnEnemiesInSightRemove(GameObject enemy)
+    {
+        enemiesInSight.Remove(enemy);
+        if (enemiesInSight.Count > 0)
+        {
+            closestTarget = enemiesInSight[0];
+            return;
         }
     }
+
+    //This code is really slow, I either should not use it, or use it sparringly
+    //public void CheckAllDistances()
+    //{
+    //    foreach (GameObject enemy in enemiesInSight)
+    //    {
+    //        if (enemy != null)
+    //        {
+    //            if(enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd() < 0)
+    //            {
+    //                Debug.Log("Fix the targetting system!");
+    //                continue;
+    //            }
+    //            if (closestTarget == null)
+    //            {
+    //                closestDistance = enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
+    //                closestTarget = enemy;
+    //            }
+
+    //            if (closestDistance > enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd())
+    //            {
+    //                closestDistance = enemy.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
+    //                closestTarget = enemy;
+    //            }
+    //            Debug.Log("closest distance is: " + closestDistance);
+    //        }
+    //    }
+    //}
 }

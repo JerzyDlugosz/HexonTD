@@ -28,6 +28,8 @@ public class PathDataNotMono
 
     public bool isCompleted;
 
+    public bool isActive = false;
+
     public void SetData(PathData data)
     {
         pathNumber = data.pathNumber;

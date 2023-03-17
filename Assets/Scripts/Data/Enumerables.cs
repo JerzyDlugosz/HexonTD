@@ -67,7 +67,9 @@ public enum MapTypes
     Taiga,
     Tundra,
     Desert,
-    Fungal
+    Fungal,
+    Volcanic,
+    Savanna
 }
 
 public enum WaveTemplate

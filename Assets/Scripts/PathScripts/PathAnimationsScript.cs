@@ -11,6 +11,13 @@ public class PathAnimationsScript : MonoBehaviour
     private Image fadeToBlackImage;
     private bool isAnimationRunning;
     private int i = 0;
+
+    [SerializeField]
+    private Transform cloudLeft;
+    [SerializeField]
+    private Transform cloudRight;
+
+    private float step = 1920/100;
     public void OnClick(int pathNumber)
     {
         Debug.Log("Clicked!");
@@ -25,6 +32,8 @@ public class PathAnimationsScript : MonoBehaviour
         {
             Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, Camera.main.transform.parent.position, speed * Time.deltaTime);
             fadeToBlackImage.color = new Color(fadeToBlackImage.color.r, fadeToBlackImage.color.g, fadeToBlackImage.color.b, i/100f);
+            cloudLeft.Translate(step, 0f, 0f);
+            cloudRight.Translate(-step, 0f, 0f);
             i++;
             if(i == 100)
             {

@@ -9,7 +9,7 @@ public class HeroTowerStats : MonoBehaviour
     public float damageMultiplierModifier = 1.5f;
 
     public int connectedTeslaTowers;
-    public float speedMultiplierModifier = 10f;
+    public float speedMultiplierModifier = 1.5f;
 
     public int connectedRailgunTowers;
     public float rangeAddModifier = 2f;

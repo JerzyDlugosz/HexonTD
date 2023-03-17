@@ -21,6 +21,8 @@ public class PathData : MonoBehaviour
 
     public bool isCompleted;
 
+    public bool isActive;
+
     public void SetData(PathData data)
     {
         pathNumber = data.pathNumber; 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,10 +38,22 @@ public class SpawnWaves : MonoBehaviour
     private MapData mapData;
     private float difficultyModifier;
 
+    private int maxEnemies = 0;
+
+    private RewardScreenData rewardScreenData;
+
+    float scoreReso = 0f;
+    float scoreEnem = 0f;
+    float scoreLive = 0f;
+    float scoreTime = 0f;
+    float score = 0f;
+    float timeSpent = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
-        gameStateManager = GameObject.Find("PresistentGameController").GetComponent<GameStateManager>();
+        gameStateManager = GameStateManager.instance;
+        rewardScreenData = winScreen.GetComponentInChildren<RewardScreenData>();
     }
 
     private bool onGameEnd = true; //bool so the if in runs works only once
@@ -51,6 +64,21 @@ public class SpawnWaves : MonoBehaviour
         if ((enemyNumber <= 0 && lastEnemySpawned) && (enemiesOnScreen.Count == 0 && onGameEnd))
         {
             winScreen.SetActive(true);
+            winScreen.GetComponentInChildren<Animator>().SetBool("StartAnim", true);
+
+            scoreReso = GetComponent<BaseController>().currentResources * 50;
+            scoreEnem = maxEnemies * 50;
+            scoreTime = -(int)(GetComponent<Timer>().time * 10);
+            scoreLive = GetComponent<BaseController>().baseHealth * 100;
+            timeSpent = (int)GetComponent<Timer>().time;
+
+            score = scoreReso + scoreEnem + scoreTime + scoreLive;
+
+            gameStateManager.GetComponent<PlayerData>().score += score;
+            gameStateManager.GetComponent<PlayerData>().allEnemiesKilled += (int)scoreEnem;
+            gameStateManager.GetComponent<PlayerData>().allResourcesSaved += (int)scoreReso;
+            gameStateManager.GetComponent<PlayerData>().allTimeSpent += (int)timeSpent;
+
             StartCoroutine(PlayWinAnimation());
             onGameEnd = false;
         }
@@ -146,7 +174,36 @@ public class SpawnWaves : MonoBehaviour
 
     IEnumerator PlayWinAnimation()
     {
-        yield return new WaitForSeconds(5);
+        rewardScreenData.reward.text = gameStateManager.GetComponent<PathData>().rewardName;
+
+        yield return new WaitForSeconds(1);
+        //for (int i = 100; i > 1; i--)
+        for (int i = 1; i <= 50; i++)
+        {
+            int scoreEnemAnim = (int)(i * scoreEnem / 50);
+            int scoreResoAnim = (int)(i * scoreReso / 50);
+            int scoreLiveAnim = (int)(i * scoreLive / 50);
+            int scoreTimeAnim = (int)(i * scoreTime / 50);
+            int scoreAnim = (int)(i * score / 50);
+            int globalScoreAnim = (int)(i * gameStateManager.GetComponent<PlayerData>().score / 50);
+
+            Debug.Log(scoreAnim);
+
+            rewardScreenData.destroyedEnemies.text = $"{maxEnemies} * 50 = {scoreEnemAnim}";
+            rewardScreenData.remainingResources.text = $"{GetComponent<BaseController>().currentResources} * 50 = {scoreResoAnim}";
+            rewardScreenData.livesRemaining.text = $"{scoreLive} * 10 = {scoreLiveAnim}";
+            rewardScreenData.timeSpend.text = $"-{timeSpent} * 10 = {scoreTimeAnim}";
+            rewardScreenData.score.text = scoreAnim.ToString();
+            rewardScreenData.globalScore.text = globalScoreAnim.ToString();
+            yield return new WaitForSeconds(0.05f);
+        }
+        rewardScreenData.continueButton.interactable = true;
+        yield return new WaitForSeconds(10);
+        GameStateManager.instance.ApplyWinReward();
+    }
+
+    public void OnContinueButtonClick()
+    {
         GameStateManager.instance.ApplyWinReward();
     }
 
@@ -211,5 +268,6 @@ public class SpawnWaves : MonoBehaviour
             }
             enemyNumber += (int)(enemy.EnemyAmount * difficultyModifier);
         }
+        maxEnemies = enemyNumber;
     }
 }

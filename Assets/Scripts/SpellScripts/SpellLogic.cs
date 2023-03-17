@@ -62,13 +62,17 @@ public class SpellLogic : MonoBehaviour
             {
                 rangeIndicator.position = new Vector3(tileHit.point.x - 0.9f, 1f, tileHit.point.z + 1.2f);
             }
+            else
+            {
+                rangeIndicator.position = new Vector3(-0.9f, 1f, 1.2f);
+            }
         }
     }
 
     public void DraggingCard()
     {
         draggingSpell = true;
-        rangeIndicator.transform.localScale = new Vector3(range, range, range);
+        rangeIndicator.transform.localScale = new Vector3(range, 0.1f, range);
         this.GetComponentInParent<Image>().enabled = true;
     }
 

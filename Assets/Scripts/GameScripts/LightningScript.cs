@@ -59,37 +59,56 @@ public class LightningScript : MonoBehaviour
                 {
                     objects.Remove(hitEnemy);
                 }
-                CheckAllDistances();
-                if (closestTarget != null)
+                if(objects.Count > i)
                 {
-                    closestTarget.GetComponent<FollowNavMesh>().TakeDamage(damage);
-                    alreadyHit.Add(closestTarget);
-                    Debug.Log($"Hitting : {closestTarget.GetComponent<EnemyStats>().enemyId}");
-                    closestDistance = 1000;
-                    closestTarget = null;
+                    if (closestTarget != null)
+                    {
+                        closestTarget.GetComponent<FollowNavMesh>().TakeDamage(damage);
+                        alreadyHit.Add(closestTarget);
+                        Debug.Log($"Hitting : {closestTarget.GetComponent<EnemyStats>().enemyId}");
+                        closestDistance = 1000;
+                        closestTarget = null;
+                    }
                 }
             }
+
+            //for (int i = 0; i < numberOfBounces; i++)
+            //{
+            //    foreach (GameObject hitEnemy in alreadyHit)
+            //    {
+            //        objects.Remove(hitEnemy);
+            //    }
+            //    CheckAllDistances();
+            //    if (closestTarget != null)
+            //    {
+            //        closestTarget.GetComponent<FollowNavMesh>().TakeDamage(damage);
+            //        alreadyHit.Add(closestTarget);
+            //        Debug.Log($"Hitting : {closestTarget.GetComponent<EnemyStats>().enemyId}");
+            //        closestDistance = 1000;
+            //        closestTarget = null;
+            //    }
+            //}
         }
     }
 
-    private void CheckAllDistances()
-    {
-        foreach (GameObject obj in objects)
-        {
-            if (obj != null)
-            {
-                if (closestTarget == null)
-                {
-                    closestDistance = obj.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
-                    closestTarget = obj;
-                }
+    //private void CheckAllDistances()
+    //{
+    //    foreach (GameObject obj in objects)
+    //    {
+    //        if (obj != null)
+    //        {
+    //            if (closestTarget == null)
+    //            {
+    //                closestDistance = obj.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
+    //                closestTarget = obj;
+    //            }
 
-                if (closestDistance > obj.GetComponent<FollowNavMesh>().GetDistanceFromEnd())
-                {
-                    closestDistance = obj.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
-                    closestTarget = obj;
-                }
-            }
-        }
-    }
+    //            if (closestDistance > obj.GetComponent<FollowNavMesh>().GetDistanceFromEnd())
+    //            {
+    //                closestDistance = obj.GetComponent<FollowNavMesh>().GetDistanceFromEnd();
+    //                closestTarget = obj;
+    //            }
+    //        }
+    //    }
+    //}
 }

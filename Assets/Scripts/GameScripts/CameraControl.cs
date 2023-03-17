@@ -5,12 +5,10 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour
 {
     public int maxScrollRange = 15;
-    public int minScrollRange = 5;  
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int minScrollRange = 5;
+
+    public int maxMovementRange = 10;
+    public int minMovementRange = -10;
 
     // Update is called once per frame
     void Update()
@@ -33,6 +31,12 @@ public class CameraControl : MonoBehaviour
         }
         Camera.main.orthographicSize -= Input.mouseScrollDelta.y;
         Camera.main.orthographicSize = Mathf.Max(minScrollRange, Mathf.Min(maxScrollRange, Camera.main.orthographicSize));
+
+        Vector3 pos = new Vector3(Mathf.Max(minMovementRange, Mathf.Min(maxMovementRange, Camera.main.transform.localPosition.x)),
+            Mathf.Max(minMovementRange, Mathf.Min(maxMovementRange, Camera.main.transform.localPosition.y)), 0f);
+
+        Camera.main.transform.localPosition = pos;
+
         //if(Camera.main.orthographicSize < 5f)
         //{
         //    Camera.main.orthographicSize = 5f;

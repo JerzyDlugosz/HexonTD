@@ -10,7 +10,10 @@ public class CameraTargetScript : MonoBehaviour
     private List<Transform> targets = new List<Transform>();
     void Start()
     {
-        lerpObject.SetLerpTargetValue(targets[GameStateManager.instance.GetComponent<PlayerData>().currentWorld]);
-        lerpObject.StartAnimation();
+        if(GameStateManager.instance.GetComponent<PlayerData>().currentWorld < 3)
+        {
+            lerpObject.SetLerpTargetValue(targets[GameStateManager.instance.GetComponent<PlayerData>().currentWorld]);
+            lerpObject.StartAnimation();
+        }
     }
 }
